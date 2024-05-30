@@ -1,14 +1,22 @@
 package com.example.taskpomodoro.ui
 
 import androidx.lifecycle.ViewModel
-import com.example.taskpomodoro.utils.StoppableCountDownTimer
+import com.example.taskpomodoro.model.PomodoroTimer
+import com.example.taskpomodoro.model.Timer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PomodoroViewModel: ViewModel() {
-    val dummyMillis: Long = 1000*25*60
+class PomodoroViewModel (
+    timer: Timer? = null
+): ViewModel() {
+    private val dummyMillis: Long = 1000*25*60
+    private val initTimer: Timer = timer?: PomodoroTimer(dummyMillis)
+
+    init {
+        initTimer.attach(this)
+    }
 
     enum class ButtonText(val buttonText: String) {
         STOP("Stop pomodoro"),
@@ -24,24 +32,21 @@ class PomodoroViewModel: ViewModel() {
         return "$strMinutes:$strSeconds"
     }
 
-    private val initTimer: StoppableCountDownTimer = object: StoppableCountDownTimer(dummyMillis, 1000) {
-        override fun onTimerTick(millisUntilFinished: Long) {
-
-            _uiState.update {
-                it.copy(
-                    timeText = getTimeFromMs(millisUntilFinished),
-                )
-            }
+    internal fun updateTimeText(millisUntilFinished: Long) {
+        _uiState.update {
+            it.copy(
+                timeText = getTimeFromMs(millisUntilFinished),
+            )
         }
+    }
 
-        override fun onTimerFinish() {
-            _uiState.update {
-                it.copy(
-                    counting = false,
-                    buttonText = ButtonText.START.buttonText,
-                    timeText = getTimeFromMs(dummyMillis)
-                )
-            }
+    internal fun updateStateOnFinish() {
+        _uiState.update {
+            it.copy(
+                counting = false,
+                buttonText = ButtonText.START.buttonText,
+                timeText = getTimeFromMs(dummyMillis)
+            )
         }
     }
 
@@ -55,13 +60,13 @@ class PomodoroViewModel: ViewModel() {
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
     fun startPomodoro() {
-        uiState.value.timer.playTimer()
         _uiState.update {
             it.copy(
                 counting = true,
                 buttonText = ButtonText.STOP.buttonText,
             )
         }
+        uiState.value.timer.playTimer()
     }
 
     fun stopPomodoro() {

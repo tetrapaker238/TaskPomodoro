@@ -1,10 +1,9 @@
 package com.example.taskpomodoro.ui
-
-import com.example.taskpomodoro.utils.StoppableCountDownTimer
+import com.example.taskpomodoro.model.Timer
 
 data class PomodoroUiState(
     val timeText: String,
     val buttonText: String,
-    val timer: StoppableCountDownTimer,
+    val timer: Timer,
     val counting: Boolean,
 )
