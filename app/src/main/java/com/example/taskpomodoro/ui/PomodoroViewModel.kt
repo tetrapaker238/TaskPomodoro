@@ -11,8 +11,14 @@ import kotlinx.coroutines.flow.update
 class PomodoroViewModel (
     timer: Timer? = null
 ): ViewModel() {
-    private val dummyMillis: Long = 1000*25*60
-    private val initTimer: Timer = timer?: PomodoroTimer(dummyMillis)
+
+    private fun convertSecondsToMilliseconds(seconds: Long): Long {
+        return 1000 * 60 * seconds
+    }
+
+    private val pomodoroTime: Long = convertSecondsToMilliseconds(25)
+    private val pomodoroBreakTime: Long = convertSecondsToMilliseconds(5)
+    private val initTimer: Timer = timer?: PomodoroTimer(pomodoroTime)
 
     init {
         initTimer.attach(this)
@@ -20,8 +26,9 @@ class PomodoroViewModel (
 
     enum class ButtonText(val buttonText: String) {
         STOP("Stop pomodoro"),
-        START("Start pomodoro")
-
+        START("Start pomodoro"),
+        START_BREAK("Start break"),
+        STOP_BREAK("Stop break")
     }
 
     private fun getTimeFromMs(millis: Long): String {
@@ -40,21 +47,37 @@ class PomodoroViewModel (
         }
     }
 
+    internal fun getStartButtonText(isOnBreak: Boolean): String {
+        return if (isOnBreak) ButtonText.START_BREAK.buttonText else ButtonText.START.buttonText
+    }
+
+    internal fun getStopButtonText(isOnBreak: Boolean): String {
+        return if (isOnBreak) ButtonText.STOP_BREAK.buttonText else ButtonText.STOP.buttonText
+    }
+
+    private fun getTimeText(isOnBreak: Boolean): String {
+        val newTime = if (isOnBreak) pomodoroBreakTime else pomodoroTime
+        return getTimeFromMs(newTime)
+    }
+
     internal fun updateStateOnFinish() {
         _uiState.update {
+            val newIsOnBreak = !it.isOnBreak
             it.copy(
+                isOnBreak = newIsOnBreak,
                 counting = false,
-                buttonText = ButtonText.START.buttonText,
-                timeText = getTimeFromMs(dummyMillis)
+                buttonText = getStartButtonText(newIsOnBreak),
+                timeText = getTimeText(newIsOnBreak)
             )
         }
     }
 
     //TODO: Depending on which amount of time user selected, we have to pass values to the state
     private val _uiState = MutableStateFlow(PomodoroUiState(
-        getTimeFromMs(dummyMillis),
+        getTimeFromMs(pomodoroTime),
         ButtonText.START.buttonText,
         timer = initTimer,
+        false,
         false,
     ))
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
@@ -63,7 +86,7 @@ class PomodoroViewModel (
         _uiState.update {
             it.copy(
                 counting = true,
-                buttonText = ButtonText.STOP.buttonText,
+                buttonText = getStopButtonText(it.isOnBreak),
             )
         }
         uiState.value.timer.playTimer()
@@ -74,7 +97,7 @@ class PomodoroViewModel (
         _uiState.update {
             it.copy(
                 counting = false,
-                buttonText = ButtonText.START.buttonText
+                buttonText = getStartButtonText(it.isOnBreak)
             )
         }
     }

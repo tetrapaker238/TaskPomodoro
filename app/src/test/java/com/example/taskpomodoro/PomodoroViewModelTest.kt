@@ -60,7 +60,7 @@ class PomodoroViewModelTest {
     }
 
     @Test
-    fun onStartTimerState_StartTimer_StartCountingAndButtonText() {
+    fun onStartTimerState_StartTimer_StartCountingAndChangeButtonText() {
         pomodoroViewModel.startPomodoro()
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
@@ -85,13 +85,34 @@ class PomodoroViewModelTest {
     }
 
     @Test
-    fun onFinishTickState_OnFinishTimer_UpdateStateOnFinish() {
+    fun onFinishTickState_OnFinishTimer_UpdateBreakStateOnFinish() {
         pomodoroViewModel.startPomodoro()
         fakeTimer.goToFinish()
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
-        assertEquals(PomodoroViewModel.ButtonText.START.buttonText, state.buttonText)
-        assertEquals("25:00", state.timeText)
+        assertEquals(PomodoroViewModel.ButtonText.START_BREAK.buttonText, state.buttonText)
+        assertEquals("05:00", state.timeText)
     }
 
+    @Test
+    fun startBreakState_OnStartBreak_StartCountingAndChangeBreakButtonText() {
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.startPomodoro()
+        state = pomodoroViewModel.uiState.value
+        assertTrue(state.counting)
+        assertEquals(PomodoroViewModel.ButtonText.STOP_BREAK.buttonText, state.buttonText)
+    }
+
+    @Test
+    fun stopBreakUiState_OnStopTimer_StopCountingAndChangeBreakButtonText() {
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.nextTick()
+        pomodoroViewModel.stopPomodoro()
+        state = pomodoroViewModel.uiState.value
+        assertFalse(state.counting)
+        assertEquals(PomodoroViewModel.ButtonText.START_BREAK.buttonText, state.buttonText)
+    }
 }
