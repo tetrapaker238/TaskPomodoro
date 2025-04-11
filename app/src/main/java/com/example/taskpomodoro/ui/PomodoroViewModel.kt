@@ -101,4 +101,11 @@ class PomodoroViewModel (
             )
         }
     }
+
+    //TODO: When pomodoro timer stops to 0, then recreate the timer with the next time (break time)
+    // so it's like PomodoroTimer(pomodoroBreakTime) and then timer.attach(this)
+
+    // TODO: Evaluate removing the functionality that resets the timer whenever it gets to zero and
+    //  instead just force the viewmodel to create another pomodoro, so it's clear that another
+    //  countdown it's being set
 }

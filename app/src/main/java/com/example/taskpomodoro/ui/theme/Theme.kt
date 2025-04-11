@@ -98,10 +98,11 @@ fun TaskPomodoroTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme) dynamicDarkColorScheme(context)
+            else dynamicLightColorScheme(context)
         }
 
         darkTheme -> darkScheme
@@ -111,8 +112,16 @@ fun TaskPomodoroTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            val decorView = window.decorView
+
+            // Ensure insets are applied correctly
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
+            // Handle the status bar appearance
+            val insetsController = WindowCompat.getInsetsController(window, decorView)
+            insetsController.apply {
+                isAppearanceLightStatusBars = !darkTheme // Control icon visibility
+            }
         }
     }
 
