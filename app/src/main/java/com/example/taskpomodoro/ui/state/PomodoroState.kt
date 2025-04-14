@@ -4,7 +4,7 @@ import com.example.taskpomodoro.ui.PomodoroViewModel
 
 abstract class PomodoroState : IPomodoroState {
 
-    override var pomodoroViewModel: PomodoroViewModel? = null;
+    override var pomodoroViewModel: PomodoroViewModel? = null
 
     abstract override fun getButtonText(): String
 

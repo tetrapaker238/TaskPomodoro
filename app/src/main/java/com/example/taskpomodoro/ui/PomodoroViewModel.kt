@@ -16,8 +16,8 @@ class PomodoroViewModel (
     private lateinit var pomodoroState: PomodoroState
 
     fun setPomodoroState(newPomodoroState: PomodoroState) {
-        this.pomodoroState = newPomodoroState;
-        this.pomodoroState.pomodoroViewModel = this;
+        this.pomodoroState = newPomodoroState
+        this.pomodoroState.pomodoroViewModel = this
     }
     init {
         setPomodoroState(CreatedPomodoro())
@@ -47,7 +47,7 @@ class PomodoroViewModel (
         }
     }
 
-    private fun getAttachedPomodoroTime(isOnBreak: Boolean, timer: Timer): Timer {
+    private fun getAttachedPomodoroTime(timer: Timer): Timer {
         return timer.setTotalTimeInMs(if (pomodoroState.isOnBreak()) pomodoroBreakTime else pomodoroTime).resetTimer().attach(this)
     }
 
@@ -63,7 +63,7 @@ class PomodoroViewModel (
                 counting = false,
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
-                timer = getAttachedPomodoroTime(pomodoroState.isOnBreak(), it.timer)
+                timer = getAttachedPomodoroTime(it.timer)
             )
         }
     }

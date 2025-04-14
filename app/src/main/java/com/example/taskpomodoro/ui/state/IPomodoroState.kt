@@ -3,7 +3,7 @@ package com.example.taskpomodoro.ui.state
 import com.example.taskpomodoro.ui.PomodoroViewModel
 
 interface IPomodoroState {
-    var pomodoroViewModel: PomodoroViewModel?;
+    var pomodoroViewModel: PomodoroViewModel?
     fun getButtonText(): String
     fun stop()
     fun start()
