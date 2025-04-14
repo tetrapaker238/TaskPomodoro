@@ -6,7 +6,7 @@ class CreatedPomodoro : PomodoroState() {
         return EButtonText.START.buttonText
     }
 
-    override fun goToBreak() {}
+    override fun finish() {}
 
     override fun isCounting(): Boolean {
         return false

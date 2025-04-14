@@ -57,7 +57,7 @@ class PomodoroViewModel (
     }
 
     internal fun updateStateOnFinish() {
-        pomodoroState.goToBreak()
+        pomodoroState.finish()
         _uiState.update {
             it.copy(
                 counting = pomodoroState.isCounting(),

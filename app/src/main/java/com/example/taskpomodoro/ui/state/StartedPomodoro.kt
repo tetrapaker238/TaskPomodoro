@@ -2,12 +2,12 @@ package com.example.taskpomodoro.ui.state
 
 class StartedPomodoro: PomodoroState() {
 
-    override fun getButtonText(): String {
-        return EButtonText.STOP.buttonText
+    override fun finish() {
+        this.pomodoroViewModel?.setPomodoroState(CreatedBreak())
     }
 
-    override fun goToBreak() {
-        this.pomodoroViewModel?.setPomodoroState(CreatedBreak())
+    override fun getButtonText(): String {
+        return EButtonText.STOP.buttonText
     }
 
     override fun isCounting(): Boolean {
@@ -23,7 +23,5 @@ class StartedPomodoro: PomodoroState() {
     override fun stop() {
         this.pomodoroViewModel?.setPomodoroState(StoppedPomodoro())
     }
-
-
 
 }

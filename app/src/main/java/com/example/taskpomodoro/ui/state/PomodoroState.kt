@@ -6,9 +6,9 @@ abstract class PomodoroState : IPomodoroState {
 
     override var pomodoroViewModel: PomodoroViewModel? = null
 
-    abstract override fun getButtonText(): String
+    abstract override fun finish()
 
-    abstract override fun goToBreak()
+    abstract override fun getButtonText(): String
 
     abstract override fun isOnBreak(): Boolean
 
