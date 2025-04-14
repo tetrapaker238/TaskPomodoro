@@ -3,6 +3,8 @@ package com.example.taskpomodoro.ui
 import androidx.lifecycle.ViewModel
 import com.example.taskpomodoro.model.PomodoroTimer
 import com.example.taskpomodoro.model.Timer
+import com.example.taskpomodoro.ui.state.CreatedPomodoro
+import com.example.taskpomodoro.ui.state.PomodoroState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,21 +13,23 @@ import kotlinx.coroutines.flow.update
 class PomodoroViewModel (
     timer: Timer? = null
 ): ViewModel() {
+    private lateinit var pomodoroState: PomodoroState
+
+    fun setPomodoroState(newPomodoroState: PomodoroState) {
+        this.pomodoroState = newPomodoroState;
+        this.pomodoroState.pomodoroViewModel = this;
+    }
+    init {
+        setPomodoroState(CreatedPomodoro())
+    }
 
     private fun convertSecondsToMilliseconds(seconds: Long): Long {
         return 1000 * 60 * seconds
     }
 
-    private val pomodoroTime: Long = convertSecondsToMilliseconds(1)
+    private val pomodoroTime: Long = convertSecondsToMilliseconds(25)
     private val pomodoroBreakTime: Long = convertSecondsToMilliseconds(5)
     private var initTimer: Timer = timer?.attach(this) ?: PomodoroTimer(pomodoroTime).attach(this)
-
-    enum class ButtonText(val buttonText: String) {
-        STOP("Stop pomodoro"),
-        START("Start pomodoro"),
-        START_BREAK("Start break"),
-        STOP_BREAK("Stop break")
-    }
 
     private fun getTimeFromMs(millis: Long): String {
         val minutes = (millis / (1000 * 60)).toInt()
@@ -43,32 +47,23 @@ class PomodoroViewModel (
         }
     }
 
-    internal fun getStartButtonText(isOnBreak: Boolean): String {
-        return if (isOnBreak) ButtonText.START_BREAK.buttonText else ButtonText.START.buttonText
+    private fun getAttachedPomodoroTime(isOnBreak: Boolean, timer: Timer): Timer {
+        return timer.setTotalTimeInMs(if (pomodoroState.isOnBreak()) pomodoroBreakTime else pomodoroTime).resetTimer().attach(this)
     }
 
-    internal fun getStopButtonText(isOnBreak: Boolean): String {
-        return if (isOnBreak) ButtonText.STOP_BREAK.buttonText else ButtonText.STOP.buttonText
-    }
-
-    private fun getTimeText(isOnBreak: Boolean): String {
-        val newTime = if (isOnBreak) pomodoroBreakTime else pomodoroTime
+    private fun getTimeText(): String {
+        val newTime = if (pomodoroState.isOnBreak()) pomodoroBreakTime else pomodoroTime
         return getTimeFromMs(newTime)
     }
 
-    private fun getAttachedPomodoroTime(isOnBreak: Boolean, timer: Timer): Timer {
-        return timer.setTotalTimeInMs(if (isOnBreak) pomodoroBreakTime else pomodoroTime).resetTimer().attach(this)
-    }
-
     internal fun updateStateOnFinish() {
+        pomodoroState.goToBreak()
         _uiState.update {
-            val newIsOnBreak = !it.isOnBreak
             it.copy(
-                isOnBreak = newIsOnBreak,
                 counting = false,
-                buttonText = getStartButtonText(newIsOnBreak),
-                timeText = getTimeText(newIsOnBreak),
-                timer = getAttachedPomodoroTime(newIsOnBreak, it.timer)
+                buttonText = pomodoroState.getButtonText(),
+                timeText = getTimeText(),
+                timer = getAttachedPomodoroTime(pomodoroState.isOnBreak(), it.timer)
             )
         }
     }
@@ -76,29 +71,30 @@ class PomodoroViewModel (
     //TODO: Depending on which amount of time user selected, we have to pass values to the state
     private val _uiState = MutableStateFlow(PomodoroUiState(
         getTimeFromMs(pomodoroTime),
-        ButtonText.START.buttonText,
+        pomodoroState.getButtonText(),
         timer = initTimer,
-        false,
         false,
     ))
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
     fun startPomodoro() {
+        pomodoroState.start()
         _uiState.update {
             it.copy(
                 counting = true,
-                buttonText = getStopButtonText(it.isOnBreak),
+                buttonText = pomodoroState.getButtonText(),
             )
         }
         uiState.value.timer.playTimer()
     }
 
     fun stopPomodoro() {
+        pomodoroState.stop()
         uiState.value.timer.stopTimer()
         _uiState.update {
             it.copy(
                 counting = false,
-                buttonText = getStartButtonText(it.isOnBreak)
+                buttonText = pomodoroState.getButtonText()
             )
         }
     }

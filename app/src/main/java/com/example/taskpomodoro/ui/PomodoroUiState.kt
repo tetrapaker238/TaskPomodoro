@@ -6,5 +6,4 @@ data class PomodoroUiState(
     val buttonText: String,
     val timer: Timer,
     val counting: Boolean,
-    val isOnBreak: Boolean,
 )

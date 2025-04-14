@@ -2,6 +2,7 @@ package com.example.taskpomodoro
 
 import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.model.Timer
+import com.example.taskpomodoro.ui.state.EButtonText
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -71,7 +72,7 @@ class PomodoroViewModelTest {
     @Test
     fun initialUiState_Construct_NonStartingState() {
         assertEquals("25:00", state.timeText)
-        assertEquals(PomodoroViewModel.ButtonText.START.buttonText, state.buttonText)
+        assertEquals(EButtonText.START.buttonText, state.buttonText)
         assertFalse(state.counting)
     }
 
@@ -80,7 +81,7 @@ class PomodoroViewModelTest {
         pomodoroViewModel.startPomodoro()
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
-        assertEquals(PomodoroViewModel.ButtonText.STOP.buttonText, state.buttonText)
+        assertEquals(EButtonText.STOP.buttonText, state.buttonText)
     }
 
     @Test
@@ -106,7 +107,7 @@ class PomodoroViewModelTest {
         fakeTimer.goToFinish()
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
-        assertEquals(PomodoroViewModel.ButtonText.START_BREAK.buttonText, state.buttonText)
+        assertEquals(EButtonText.START_BREAK.buttonText, state.buttonText)
         assertEquals("05:00", state.timeText)
     }
 
@@ -117,7 +118,7 @@ class PomodoroViewModelTest {
         pomodoroViewModel.startPomodoro()
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
-        assertEquals(PomodoroViewModel.ButtonText.STOP_BREAK.buttonText, state.buttonText)
+        assertEquals(EButtonText.STOP_BREAK.buttonText, state.buttonText)
     }
 
     @Test
@@ -139,6 +140,6 @@ class PomodoroViewModelTest {
         pomodoroViewModel.stopPomodoro()
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
-        assertEquals(PomodoroViewModel.ButtonText.START_BREAK.buttonText, state.buttonText)
+        assertEquals(EButtonText.START_BREAK.buttonText, state.buttonText)
     }
 }
