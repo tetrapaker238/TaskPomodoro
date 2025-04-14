@@ -20,13 +20,29 @@ import org.junit.Assert.*
 private class FakeTimer(timeInMillis: Long) : Timer {
 
     private var actualTimeInMillis = timeInMillis
+    private var intervalTime = 1000L
     private lateinit var pomodoroViewModel: PomodoroViewModel
     override fun playTimer() {}
 
     override fun stopTimer() {}
 
-    override fun attach(pomodoroViewModel: PomodoroViewModel) {
+    override fun attach(pomodoroViewModel: PomodoroViewModel): FakeTimer {
         this.pomodoroViewModel = pomodoroViewModel
+        return this
+    }
+
+    override fun setTotalTimeInMs(newTimeInMs: Long): Timer {
+        this.actualTimeInMillis = newTimeInMs
+        return this
+    }
+
+    override fun setIntervalTime(newIntervalTime: Long): Timer {
+        this.intervalTime = newIntervalTime
+        return this
+    }
+
+    override fun resetTimer(): Timer {
+        return this
     }
 
     fun nextTick() {
@@ -102,6 +118,16 @@ class PomodoroViewModelTest {
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
         assertEquals(PomodoroViewModel.ButtonText.STOP_BREAK.buttonText, state.buttonText)
+    }
+
+    @Test
+    fun onFirstNextTickBreakState_SecondPassed_UpdateWithBreakTimeText() {
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.nextTick()
+        state = pomodoroViewModel.uiState.value
+        assertEquals("04:59", state.timeText)
     }
 
     @Test

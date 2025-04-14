@@ -16,13 +16,9 @@ class PomodoroViewModel (
         return 1000 * 60 * seconds
     }
 
-    private val pomodoroTime: Long = convertSecondsToMilliseconds(25)
+    private val pomodoroTime: Long = convertSecondsToMilliseconds(1)
     private val pomodoroBreakTime: Long = convertSecondsToMilliseconds(5)
-    private val initTimer: Timer = timer?: PomodoroTimer(pomodoroTime)
-
-    init {
-        initTimer.attach(this)
-    }
+    private var initTimer: Timer = timer?.attach(this) ?: PomodoroTimer(pomodoroTime).attach(this)
 
     enum class ButtonText(val buttonText: String) {
         STOP("Stop pomodoro"),
@@ -60,6 +56,10 @@ class PomodoroViewModel (
         return getTimeFromMs(newTime)
     }
 
+    private fun getAttachedPomodoroTime(isOnBreak: Boolean, timer: Timer): Timer {
+        return timer.setTotalTimeInMs(if (isOnBreak) pomodoroBreakTime else pomodoroTime).resetTimer().attach(this)
+    }
+
     internal fun updateStateOnFinish() {
         _uiState.update {
             val newIsOnBreak = !it.isOnBreak
@@ -67,7 +67,8 @@ class PomodoroViewModel (
                 isOnBreak = newIsOnBreak,
                 counting = false,
                 buttonText = getStartButtonText(newIsOnBreak),
-                timeText = getTimeText(newIsOnBreak)
+                timeText = getTimeText(newIsOnBreak),
+                timer = getAttachedPomodoroTime(newIsOnBreak, it.timer)
             )
         }
     }
@@ -101,11 +102,4 @@ class PomodoroViewModel (
             )
         }
     }
-
-    //TODO: When pomodoro timer stops to 0, then recreate the timer with the next time (break time)
-    // so it's like PomodoroTimer(pomodoroBreakTime) and then timer.attach(this)
-
-    // TODO: Evaluate removing the functionality that resets the timer whenever it gets to zero and
-    //  instead just force the viewmodel to create another pomodoro, so it's clear that another
-    //  countdown it's being set
 }
