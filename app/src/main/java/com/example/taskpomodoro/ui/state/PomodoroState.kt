@@ -8,11 +8,14 @@ abstract class PomodoroState : IPomodoroState {
 
     abstract override fun getButtonText(): String
 
+    abstract override fun goToBreak()
+
+    abstract override fun isOnBreak(): Boolean
+
     abstract override fun stop()
 
     abstract override fun start()
 
-    abstract override fun goToBreak()
+    abstract override fun isCounting(): Boolean
 
-    abstract override fun isOnBreak(): Boolean
 }

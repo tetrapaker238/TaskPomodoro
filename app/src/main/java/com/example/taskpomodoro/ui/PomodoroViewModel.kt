@@ -60,7 +60,7 @@ class PomodoroViewModel (
         pomodoroState.goToBreak()
         _uiState.update {
             it.copy(
-                counting = false,
+                counting = pomodoroState.isCounting(),
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
                 timer = getAttachedPomodoroTime(it.timer)
@@ -73,7 +73,7 @@ class PomodoroViewModel (
         getTimeFromMs(pomodoroTime),
         pomodoroState.getButtonText(),
         timer = initTimer,
-        false,
+        pomodoroState.isCounting(),
     ))
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
@@ -81,7 +81,7 @@ class PomodoroViewModel (
         pomodoroState.start()
         _uiState.update {
             it.copy(
-                counting = true,
+                counting = pomodoroState.isCounting(),
                 buttonText = pomodoroState.getButtonText(),
             )
         }
@@ -93,7 +93,7 @@ class PomodoroViewModel (
         uiState.value.timer.stopTimer()
         _uiState.update {
             it.copy(
-                counting = false,
+                counting = pomodoroState.isCounting(),
                 buttonText = pomodoroState.getButtonText()
             )
         }

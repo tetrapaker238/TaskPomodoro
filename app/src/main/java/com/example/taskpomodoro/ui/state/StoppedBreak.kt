@@ -5,15 +5,22 @@ class StoppedBreak: PomodoroState() {
         return EButtonText.START_BREAK.buttonText
     }
 
-    override fun stop() {}
+    override fun goToBreak() {}
+
+    override fun isCounting(): Boolean {
+        return false
+    }
+
+    override fun isOnBreak(): Boolean {
+        return true
+    }
+
 
     override fun start() {
         this.pomodoroViewModel?.setPomodoroState(StartedBreak())
     }
 
-    override fun goToBreak() {}
+    override fun stop() {}
 
-    override fun isOnBreak(): Boolean {
-        return true
-    }
+
 }
