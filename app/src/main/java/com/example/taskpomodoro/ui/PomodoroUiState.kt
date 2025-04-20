@@ -1,17 +1,19 @@
 package com.example.taskpomodoro.ui
+
 import com.example.taskpomodoro.model.Timer
 
 data class PomodoroUiState(
     val timeText: String,
     val buttonText: String,
     val timer: Timer,
-    val counting: Boolean,
-    val pomodoroSettings: PomodoroSettings
+    val counting: Boolean = false,
+    val showDialog: Boolean = false,
+    val pomodoroSettings: PomodoroSettings = PomodoroSettings(20, 5, 10, 4)
 )
 
 data class PomodoroSettings(
-    val pomodoroTime: Int,
-    val breakTime: Int,
-    val longBreakTime: Int,
-    val longBreakInterval: Int,
+    val pomodoroTime: Int = 25,
+    val breakTime: Int = 5,
+    val longBreakTime: Int = 10,
+    val longBreakInterval: Int = 4,
 )

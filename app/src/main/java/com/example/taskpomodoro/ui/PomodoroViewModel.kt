@@ -10,15 +10,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PomodoroViewModel (
+class PomodoroViewModel(
     timer: Timer? = null
-): ViewModel() {
+) : ViewModel() {
     private lateinit var pomodoroState: PomodoroState
 
     fun setPomodoroState(newPomodoroState: PomodoroState) {
         this.pomodoroState = newPomodoroState
         this.pomodoroState.pomodoroViewModel = this
     }
+
     init {
         setPomodoroState(CreatedPomodoro())
     }
@@ -27,15 +28,9 @@ class PomodoroViewModel (
         return (1000 * 60 * minutes).toLong()
     }
 
-    val pomodoroSettings = PomodoroSettings(
-        pomodoroTime = 25,
-        breakTime = 5,
-        longBreakTime = 10,
-        longBreakInterval = 4,
-    )
+    val pomodoroSettings = PomodoroSettings()
     private var initTimer: Timer = timer?.attach(this)
-        ?: PomodoroTimer(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime))
-            .attach(this)
+        ?: PomodoroTimer(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime)).attach(this)
 
     private fun getTimeFromMs(millis: Long): String {
         val minutes = (millis / (1000 * 60)).toInt()
@@ -54,13 +49,22 @@ class PomodoroViewModel (
     }
 
     private fun getAttachedPomodoroTime(timer: Timer): Timer {
-        val timeInMs =  convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
+        val timeInMs =
+            convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
         return timer.setTotalTimeInMs(timeInMs).resetTimer().attach(this)
     }
 
     private fun getTimeText(): String {
-        val newTime = convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
+        // TODO: Remove the .isOnBreak dependency, and get the settings break time or pomodoroTime
+        //  when corresponding instead
+        val newTime =
+            convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
         return getTimeFromMs(newTime)
+    }
+
+    private fun resetTimer(timer: Timer, pomodoroTime: Int) {
+        timer.setTotalTimeInMs(convertMinutesToMilliseconds(pomodoroTime))
+        timer.resetTimer()
     }
 
     internal fun updateStateOnFinish() {
@@ -75,13 +79,16 @@ class PomodoroViewModel (
         }
     }
 
-    private val _uiState = MutableStateFlow(PomodoroUiState(
-        getTimeFromMs(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime)),
-        pomodoroState.getButtonText(),
-        timer = initTimer,
-        pomodoroState.isCounting(),
-        pomodoroSettings
-    ))
+    private val _uiState = MutableStateFlow(
+        PomodoroUiState(
+            getTimeFromMs(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime)),
+            pomodoroState.getButtonText(),
+            timer = initTimer,
+            pomodoroState.isCounting(),
+            showDialog = false,
+            pomodoroSettings
+        )
+    )
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
     fun startPomodoro() {
@@ -100,8 +107,25 @@ class PomodoroViewModel (
         uiState.value.timer.stopTimer()
         _uiState.update {
             it.copy(
-                counting = pomodoroState.isCounting(),
-                buttonText = pomodoroState.getButtonText()
+                counting = pomodoroState.isCounting(), buttonText = pomodoroState.getButtonText()
+            )
+        }
+    }
+
+    fun toggleDialog() {
+        _uiState.update {
+            it.copy(
+                showDialog = !it.showDialog
+            )
+        }
+    }
+
+    fun updateSettings(settings: PomodoroSettings) {
+        _uiState.update {
+            resetTimer(it.timer, settings.pomodoroTime)
+            it.copy(
+                timeText = getTimeFromMs(convertMinutesToMilliseconds(settings.pomodoroTime)),
+                pomodoroSettings = settings
             )
         }
     }

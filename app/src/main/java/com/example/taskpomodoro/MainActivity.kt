@@ -8,10 +8,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -33,10 +39,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.taskpomodoro.ui.PomodoroSettings
+import com.example.taskpomodoro.ui.PomodoroUiState
 import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.ui.theme.TaskPomodoroTheme
 
@@ -50,10 +58,9 @@ class MainActivity : ComponentActivity() {
             TaskPomodoroTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    TimeDisplay()
+                    PomodoroScreen()
                 }
             }
         }
@@ -61,33 +68,43 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Toolbar(modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        IconButton(onClick = {}) {
-            Icon(Icons.Filled.Settings,
+fun Toolbar(modifier: Modifier = Modifier, onSettingsClick: () -> Unit) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(
+                WindowInsets.statusBars
+            ), horizontalArrangement = Arrangement.End
+    ) {
+        IconButton(onClick = onSettingsClick) {
+            Icon(
+                Icons.Filled.Settings,
                 contentDescription = "Configure pomodoro",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(48.dp)
             )
         }
     }
 }
 
 @Composable
-fun TimeDisplay() {
+fun TimeDisplay(pomodoroViewModel: PomodoroViewModel) {
     ButtonAndTime(
         modifier = Modifier
             .fillMaxSize()
-            .wrapContentSize(align = Alignment.Center)
+            .wrapContentSize(align = Alignment.Center),
+        pomodoroViewModel = pomodoroViewModel
     )
 }
 
 @Composable
-fun ButtonAndTime(modifier: Modifier = Modifier, pomodoroViewModel: PomodoroViewModel = viewModel()) {
+fun ButtonAndTime(
+    modifier: Modifier = Modifier, pomodoroViewModel: PomodoroViewModel
+) {
 
-    val pomodoroUiState by pomodoroViewModel.uiState.collectAsState() // Delegates from the
-    // pomodoroViewModel Ui State the collectAsState getter
+    val pomodoroUiState by pomodoroViewModel.uiState.collectAsState()
 
-    Column (
+    Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -96,58 +113,126 @@ fun ButtonAndTime(modifier: Modifier = Modifier, pomodoroViewModel: PomodoroView
             text = pomodoroUiState.timeText,
         )
         Button(onClick = {
-            if (!pomodoroUiState.counting){
+            if (!pomodoroUiState.counting) {
                 pomodoroViewModel.startPomodoro()
             } else {
                 pomodoroViewModel.stopPomodoro()
             }
         }) {
             Text(
-                text = pomodoroUiState.buttonText,
-                style = MaterialTheme.typography.titleLarge
+                text = pomodoroUiState.buttonText, style = MaterialTheme.typography.titleLarge
             )
         }
     }
 }
 
 @Composable
-fun PomodoroScreen(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
+fun PomodoroScreen(
+    modifier: Modifier = Modifier, pomodoroViewModel: PomodoroViewModel = viewModel()
+) {
+    val pomodoroUiState: PomodoroUiState by pomodoroViewModel.uiState.collectAsState()
+    // pomodoroViewModel Ui State the collectAsState getter
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
         Row(verticalAlignment = Alignment.Top) {
-            Toolbar()
+            Toolbar(onSettingsClick = { pomodoroViewModel.toggleDialog() })
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TimeDisplay()
+            TimeDisplay(pomodoroViewModel = pomodoroViewModel)
+        }
+
+        if (pomodoroUiState.showDialog) {
+            DialogWithForm(
+                initialSettings = pomodoroUiState.pomodoroSettings,
+                updateState = { newSettings ->
+                    pomodoroViewModel.updateSettings(newSettings)
+                    pomodoroViewModel.toggleDialog()
+                },
+                onDismissRequest = { pomodoroViewModel.toggleDialog() })
+        }
+    }
+
+}
+
+@Composable
+fun SettingsForm(
+    modifier: Modifier = Modifier,
+    initialSettings: PomodoroSettings,
+    updateState: (PomodoroSettings) -> Unit
+) {
+    var pomodoroTime by remember { mutableStateOf(initialSettings.pomodoroTime.toString()) }
+    var breakTime by remember { mutableStateOf(initialSettings.breakTime.toString()) }
+    var longBreakTime by remember { mutableStateOf(initialSettings.longBreakTime.toString()) }
+    var longBreakInterval by remember { mutableStateOf(initialSettings.longBreakInterval.toString()) }
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            value = pomodoroTime,
+            onValueChange = { valor: String -> pomodoroTime = valor },
+            label = { Text("Pomodoro") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        )
+        Spacer(modifier = Modifier.height(26.dp))
+        TextField(
+            value = breakTime,
+            onValueChange = { valor: String -> breakTime = valor },
+            label = { Text("Break") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        Spacer(modifier = Modifier.height(26.dp))
+        TextField(
+            value = longBreakTime,
+            onValueChange = { valor: String -> longBreakTime = valor },
+            label = { Text("Long break") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        Spacer(modifier = Modifier.height(26.dp))
+        TextField(
+            value = longBreakInterval,
+            onValueChange = { valor: String -> longBreakInterval = valor },
+            label = { Text("Long break interval") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        Spacer(modifier = Modifier.height(52.dp))
+        Button(onClick = {
+            updateState(
+                PomodoroSettings(
+                    pomodoroTime = pomodoroTime.toInt(),
+                    breakTime = breakTime.toInt(),
+                    longBreakTime = longBreakTime.toInt(),
+                    longBreakInterval = longBreakInterval.toInt()
+                )
+            )
+        }) {
+            Text("ACCEPT")
         }
     }
 }
 
 @Composable
-fun SettingsForm(modifier: Modifier = Modifier, initialSettings: PomodoroSettings, updateState: (PomodoroSettings) -> Unit) {
-    var pomodoroTime by remember { mutableStateOf(initialSettings.pomodoroTime.toString()) }
-    var breakTime by remember { mutableStateOf(initialSettings.breakTime.toString()) }
-    var longBreakTime by remember { mutableStateOf(initialSettings.longBreakTime.toString()) }
-    var longBreakInterval by remember { mutableStateOf(initialSettings.longBreakInterval.toString())}
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(value= pomodoroTime, onValueChange =
-            {valor: String -> pomodoroTime = valor},
-            label = {Text("Pomodoro")},
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        )
-        Spacer(modifier = Modifier.height(26.dp))
-        TextField(value= breakTime, onValueChange = {valor: String -> breakTime =  valor} , label = {Text("Break")}, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) )
-        Spacer(modifier = Modifier.height(26.dp))
-        TextField(value= longBreakTime, onValueChange = {valor: String -> longBreakTime =  valor} , label = {Text("Long break")}, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) )
-        Spacer(modifier = Modifier.height(26.dp))
-        TextField(value= longBreakInterval, onValueChange = {valor: String -> longBreakInterval =  valor} , label = {Text("Long break interval")}, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) )
-        Spacer(modifier = Modifier.height(52.dp))
-        Button(onClick =  {updateState(PomodoroSettings(
-            pomodoroTime = pomodoroTime.toInt(),
-            breakTime = breakTime.toInt(),
-            longBreakTime = longBreakTime.toInt(),
-            longBreakInterval = longBreakInterval.toInt()
-        ))}) {
-            Text("ACCEPT")
+fun DialogWithForm(
+    modifier: Modifier = Modifier,
+    initialSettings: PomodoroSettings,
+    updateState: (PomodoroSettings) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = modifier
+                .windowInsetsPadding(WindowInsets.statusBars),
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(8.dp),
+            tonalElevation = 8.dp
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.padding(all = 24.dp)
+            ) {
+                Text(text = "Pomodoro settings", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(8.dp))
+                SettingsForm(initialSettings = initialSettings, updateState = updateState)
+            }
         }
     }
 }
@@ -158,10 +243,9 @@ fun SettingsForm(modifier: Modifier = Modifier, initialSettings: PomodoroSetting
 )
 @Composable
 fun SettingsFormPreview() {
-    TaskPomodoroTheme (darkTheme = true) {
+    TaskPomodoroTheme(darkTheme = true) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
         ) {
             SettingsForm(initialSettings = PomodoroSettings(25, 5, 10, 4), updateState = {})
         }
@@ -172,13 +256,12 @@ fun SettingsFormPreview() {
     showBackground = true,
     showSystemUi = true,
 
-)
+    )
 @Composable
 fun GreetingPreview() {
-    TaskPomodoroTheme (darkTheme = true) {
+    TaskPomodoroTheme(darkTheme = true) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
         ) {
             PomodoroScreen()
         }
