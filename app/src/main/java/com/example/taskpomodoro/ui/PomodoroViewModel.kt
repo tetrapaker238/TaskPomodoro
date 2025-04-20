@@ -23,13 +23,19 @@ class PomodoroViewModel (
         setPomodoroState(CreatedPomodoro())
     }
 
-    private fun convertSecondsToMilliseconds(seconds: Long): Long {
-        return 1000 * 60 * seconds
+    private fun convertMinutesToMilliseconds(minutes: Int): Long {
+        return (1000 * 60 * minutes).toLong()
     }
 
-    private val pomodoroTime: Long = convertSecondsToMilliseconds(25)
-    private val pomodoroBreakTime: Long = convertSecondsToMilliseconds(5)
-    private var initTimer: Timer = timer?.attach(this) ?: PomodoroTimer(pomodoroTime).attach(this)
+    val pomodoroSettings = PomodoroSettings(
+        pomodoroTime = 25,
+        breakTime = 5,
+        longBreakTime = 10,
+        longBreakInterval = 4,
+    )
+    private var initTimer: Timer = timer?.attach(this)
+        ?: PomodoroTimer(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime))
+            .attach(this)
 
     private fun getTimeFromMs(millis: Long): String {
         val minutes = (millis / (1000 * 60)).toInt()
@@ -48,11 +54,12 @@ class PomodoroViewModel (
     }
 
     private fun getAttachedPomodoroTime(timer: Timer): Timer {
-        return timer.setTotalTimeInMs(if (pomodoroState.isOnBreak()) pomodoroBreakTime else pomodoroTime).resetTimer().attach(this)
+        val timeInMs =  convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
+        return timer.setTotalTimeInMs(timeInMs).resetTimer().attach(this)
     }
 
     private fun getTimeText(): String {
-        val newTime = if (pomodoroState.isOnBreak()) pomodoroBreakTime else pomodoroTime
+        val newTime = convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) pomodoroSettings.breakTime else pomodoroSettings.pomodoroTime)
         return getTimeFromMs(newTime)
     }
 
@@ -68,12 +75,12 @@ class PomodoroViewModel (
         }
     }
 
-    //TODO: Depending on which amount of time user selected, we have to pass values to the state
     private val _uiState = MutableStateFlow(PomodoroUiState(
-        getTimeFromMs(pomodoroTime),
+        getTimeFromMs(convertMinutesToMilliseconds(pomodoroSettings.pomodoroTime)),
         pomodoroState.getButtonText(),
         timer = initTimer,
         pomodoroState.isCounting(),
+        pomodoroSettings
     ))
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 

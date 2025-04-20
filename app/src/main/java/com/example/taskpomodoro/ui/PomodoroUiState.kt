@@ -6,4 +6,12 @@ data class PomodoroUiState(
     val buttonText: String,
     val timer: Timer,
     val counting: Boolean,
+    val pomodoroSettings: PomodoroSettings
+)
+
+data class PomodoroSettings(
+    val pomodoroTime: Int,
+    val breakTime: Int,
+    val longBreakTime: Int,
+    val longBreakInterval: Int,
 )
