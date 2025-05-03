@@ -3,10 +3,9 @@ package com.example.taskpomodoro.model
 import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.utils.StoppableCountDownTimer
 
-class PomodoroTimer (
-    val timeInMillis: Long
-): Timer {
-    private var totalTimeInMillis = timeInMillis
+class PomodoroTimer(
+    var timeInMillis: Long
+) : Timer {
     private var intervalTime = 1000L
 
     private var stoppableCountDownTimer: StoppableCountDownTimer? = null
@@ -20,20 +19,21 @@ class PomodoroTimer (
     }
 
     override fun attach(pomodoroViewModel: PomodoroViewModel): PomodoroTimer {
-        stoppableCountDownTimer = object: StoppableCountDownTimer(totalTimeInMillis, intervalTime) {
-            override fun onTimerTick(millisUntilFinished: Long) {
-                pomodoroViewModel.updateTimeText(millisUntilFinished)
-            }
+        stoppableCountDownTimer =
+            object : StoppableCountDownTimer(timeInMillis, intervalTime) {
+                override fun onTimerTick(millisUntilFinished: Long) {
+                    pomodoroViewModel.updateTimeText(millisUntilFinished)
+                }
 
-            override fun onTimerFinish() {
-                pomodoroViewModel.updateStateOnFinish()
+                override fun onTimerFinish() {
+                    pomodoroViewModel.updateStateOnFinish()
+                }
             }
-        }
         return this
     }
 
     override fun setTotalTimeInMs(newTimeInMs: Long): Timer {
-        this.totalTimeInMillis = newTimeInMs
+        this.timeInMillis = newTimeInMs
         return this
     }
 
@@ -43,7 +43,7 @@ class PomodoroTimer (
     }
 
     override fun resetTimer(): Timer {
-        stoppableCountDownTimer?.resetTimer(timeInMillis, intervalTime)
+        stoppableCountDownTimer?.resetTimer(this.timeInMillis, intervalTime)
         return this
     }
 }

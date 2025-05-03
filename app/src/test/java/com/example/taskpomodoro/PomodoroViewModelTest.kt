@@ -1,11 +1,14 @@
 package com.example.taskpomodoro
 
-import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.model.Timer
+import com.example.taskpomodoro.ui.PomodoroSettings
+import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.ui.state.EButtonText
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -58,7 +61,7 @@ private class FakeTimer(timeInMillis: Long) : Timer {
 }
 
 class PomodoroViewModelTest {
-    private val dummyMillis: Long = 1000*25*60
+    private val dummyMillis: Long = 1000 * 25 * 60
     private val fakeTimer: FakeTimer = FakeTimer(dummyMillis)
     private val pomodoroViewModel = PomodoroViewModel(fakeTimer)
     private var state = pomodoroViewModel.uiState.value
@@ -141,5 +144,52 @@ class PomodoroViewModelTest {
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
         assertEquals(EButtonText.START_BREAK.buttonText, state.buttonText)
+    }
+
+    @Test
+    fun settingsChange_OnSettingsChange_ChangeUiState() {
+        val newPomodoroTime = 50
+        val newBreakTime = 10
+        val newLongBreakTime = 15
+        val newLongBreakInterval = 6
+        pomodoroViewModel.updateSettings(
+            PomodoroSettings(
+                pomodoroTime = newPomodoroTime,
+                breakTime = newBreakTime,
+                longBreakTime = newLongBreakTime,
+                longBreakInterval = newLongBreakInterval
+            )
+        )
+
+        state = pomodoroViewModel.uiState.value
+        val pomodoroSettings = state.pomodoroSettings
+        assertTrue(pomodoroSettings.pomodoroTime == newPomodoroTime)
+        assertTrue(pomodoroSettings.breakTime == newBreakTime)
+        assertTrue(pomodoroSettings.longBreakTime == newLongBreakTime)
+        assertTrue(pomodoroSettings.longBreakInterval == newLongBreakInterval)
+        assertFalse(state.counting)
+        assertEquals(state.timeText, "50:00")
+        assertEquals(state.buttonText, "Start pomodoro")
+        assertFalse(state.showDialog)
+    }
+
+    @Test
+    fun onFirstNextTickSettingsChangedState_OnTickPassed_TimeTextChanged() {
+        val newPomodoroTime = 50
+        val newBreakTime = 10
+        val newLongBreakTime = 15
+        val newLongBreakInterval = 6
+        pomodoroViewModel.updateSettings(
+            PomodoroSettings(
+                pomodoroTime = newPomodoroTime,
+                breakTime = newBreakTime,
+                longBreakTime = newLongBreakTime,
+                longBreakInterval = newLongBreakInterval
+            )
+        )
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.nextTick()
+        state = pomodoroViewModel.uiState.value
+        assertEquals(state.timeText, "49:59")
     }
 }

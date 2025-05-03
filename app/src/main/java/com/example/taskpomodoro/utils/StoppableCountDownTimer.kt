@@ -2,12 +2,15 @@ package com.example.taskpomodoro.utils
 
 import android.os.CountDownTimer
 
-abstract class StoppableCountDownTimer(private val millisInFuture: Long, private val countDownInterval: Long) {
+abstract class StoppableCountDownTimer(
+    private var millisInFuture: Long,
+    private var countDownInterval: Long
+) {
     private var _timer: CountDownTimer
     private var started: Boolean = false
-    private var lastTimeInMs: Long = millisInFuture
+
     init {
-        _timer = this.createTimer(millisInFuture, countDownInterval)
+        _timer = this.createTimer()
     }
 
     /**
@@ -16,15 +19,15 @@ abstract class StoppableCountDownTimer(private val millisInFuture: Long, private
      * @param countDownInterval the interval time in milliseconds to trigger the onTick function
      * @return CountDownTimer
      */
-    private fun createTimer(millisInFuture: Long, countDownInterval: Long): CountDownTimer {
-        return object: CountDownTimer(millisInFuture, countDownInterval) {
+    private fun createTimer(): CountDownTimer {
+        return object : CountDownTimer(millisInFuture, countDownInterval) {
             override fun onTick(millisUntilFinished: Long) {
-                lastTimeInMs = millisUntilFinished
+                millisInFuture = millisUntilFinished
                 onTimerTick(millisUntilFinished)
             }
 
             override fun onFinish() {
-                lastTimeInMs = 0
+                millisInFuture = 0
                 started = false
                 onTimerFinish()
             }
@@ -39,10 +42,10 @@ abstract class StoppableCountDownTimer(private val millisInFuture: Long, private
      * Starts the timer creating a new CountDownTimer only if it hasn't started or finished yet
      */
     fun playTimer() {
-        if (started || lastTimeInMs.toInt() <= 0) {
+        if (started || millisInFuture.toInt() <= 0) {
             return
         }
-        _timer = createTimer(lastTimeInMs, countDownInterval).start()
+        _timer = createTimer().start()
         started = true
     }
 
@@ -65,7 +68,9 @@ abstract class StoppableCountDownTimer(private val millisInFuture: Long, private
      */
     fun resetTimer(totalTime: Long = millisInFuture, intervalTime: Long = countDownInterval) {
         _timer.cancel()
+        this.millisInFuture = totalTime
+        this.countDownInterval = intervalTime
         started = false
-        _timer = createTimer(totalTime, intervalTime)
+        _timer = createTimer()
     }
 }
