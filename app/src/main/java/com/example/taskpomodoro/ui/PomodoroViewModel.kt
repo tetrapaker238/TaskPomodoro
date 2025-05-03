@@ -126,6 +126,7 @@ class PomodoroViewModel(
         _uiState.update {
             resetTimer(it.timer, settings.pomodoroTime)
             it.copy(
+                counting = pomodoroState.isCounting(),
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeFromMs(convertMinutesToMilliseconds(settings.pomodoroTime)),
                 pomodoroSettings = settings
