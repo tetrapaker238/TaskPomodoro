@@ -107,7 +107,8 @@ class PomodoroViewModel(
         uiState.value.timer.stopTimer()
         _uiState.update {
             it.copy(
-                counting = pomodoroState.isCounting(), buttonText = pomodoroState.getButtonText()
+                counting = pomodoroState.isCounting(),
+                buttonText = pomodoroState.getButtonText()
             )
         }
     }
@@ -121,9 +122,11 @@ class PomodoroViewModel(
     }
 
     fun updateSettings(settings: PomodoroSettings) {
+        pomodoroState.stop()
         _uiState.update {
             resetTimer(it.timer, settings.pomodoroTime)
             it.copy(
+                buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeFromMs(convertMinutesToMilliseconds(settings.pomodoroTime)),
                 pomodoroSettings = settings
             )

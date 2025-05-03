@@ -7,7 +7,8 @@ abstract class StoppableCountDownTimer(
     private var countDownInterval: Long
 ) {
     private var _timer: CountDownTimer
-    private var started: Boolean = false
+    var started: Boolean = false
+        private set
 
     init {
         _timer = this.createTimer()
