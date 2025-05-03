@@ -156,6 +156,25 @@ fun PomodoroScreen(
 }
 
 @Composable
+fun NumericTextFieldWithFilter(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String
+) {
+    TextField(
+        value = value,
+        onValueChange = { newText ->
+            if (newText.all { it.isDigit() }) {
+                onValueChange(newText)
+            }
+        },
+        label = { Text(label) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        singleLine = true
+    )
+}
+
+@Composable
 fun SettingsForm(
     modifier: Modifier = Modifier,
     initialSettings: PomodoroSettings,
@@ -166,41 +185,37 @@ fun SettingsForm(
     var longBreakTime by remember { mutableStateOf(initialSettings.longBreakTime.toString()) }
     var longBreakInterval by remember { mutableStateOf(initialSettings.longBreakInterval.toString()) }
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(
+        NumericTextFieldWithFilter(
             value = pomodoroTime,
-            onValueChange = { valor: String -> pomodoroTime = valor },
-            label = { Text("Pomodoro") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onValueChange = { pomodoroTime = it },
+            label = "Pomodoro"
         )
         Spacer(modifier = Modifier.height(26.dp))
-        TextField(
+        NumericTextFieldWithFilter(
             value = breakTime,
-            onValueChange = { valor: String -> breakTime = valor },
-            label = { Text("Break") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            onValueChange = { breakTime = it },
+            label = "Break"
         )
         Spacer(modifier = Modifier.height(26.dp))
-        TextField(
+        NumericTextFieldWithFilter(
             value = longBreakTime,
-            onValueChange = { valor: String -> longBreakTime = valor },
-            label = { Text("Long break") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            onValueChange = { longBreakTime = it },
+            label = "Long break"
         )
         Spacer(modifier = Modifier.height(26.dp))
-        TextField(
+        NumericTextFieldWithFilter(
             value = longBreakInterval,
-            onValueChange = { valor: String -> longBreakInterval = valor },
-            label = { Text("Long break interval") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            onValueChange = { longBreakInterval = it },
+            label = "Long break interval"
         )
         Spacer(modifier = Modifier.height(52.dp))
         Button(onClick = {
             updateState(
                 PomodoroSettings(
-                    pomodoroTime = pomodoroTime.toInt(),
-                    breakTime = breakTime.toInt(),
-                    longBreakTime = longBreakTime.toInt(),
-                    longBreakInterval = longBreakInterval.toInt()
+                    pomodoroTime = pomodoroTime.toIntOrNull() ?: 0,
+                    breakTime = breakTime.toIntOrNull() ?: 0,
+                    longBreakTime = longBreakTime.toIntOrNull() ?: 0,
+                    longBreakInterval = longBreakInterval.toIntOrNull() ?: 0
                 )
             )
         }) {
