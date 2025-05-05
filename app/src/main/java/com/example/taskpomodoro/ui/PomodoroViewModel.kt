@@ -73,16 +73,21 @@ class PomodoroViewModel(
         return timer?.setTotalTimeInMs(timeInMs)?.resetTimer()
     }
 
+    private fun getTime(): Int {
+        return if (pomodoroState.isOnBreak()) uiState.value.pomodoroSettings.breakTime else uiState.value.pomodoroSettings.pomodoroTime
+    }
+
+
     private fun getTimeText(): String {
         // TODO: Remove the .isOnBreak dependency, and get the settings break time or pomodoroTime
         //  when corresponding instead
         val newTime =
-            convertMinutesToMilliseconds(if (pomodoroState.isOnBreak()) uiState.value.pomodoroSettings.breakTime else uiState.value.pomodoroSettings.pomodoroTime)
+            convertMinutesToMilliseconds(this.getTime())
         return getTimeFromMs(newTime)
     }
 
-    private fun resetTimer(timer: Timer, pomodoroTime: Int) {
-        timer.setTotalTimeInMs(convertMinutesToMilliseconds(pomodoroTime))
+    private fun resetTimer(timer: Timer, time: Int) {
+        timer.setTotalTimeInMs(convertMinutesToMilliseconds(time))
         timer.resetTimer()
     }
 
@@ -131,12 +136,14 @@ class PomodoroViewModel(
     fun updateSettings(settings: PomodoroSettings) {
         pomodoroState.stop()
         _uiState.update {
-            resetTimer(timer, settings.pomodoroTime)
+            it.copy(pomodoroSettings = settings)
+        }
+        _uiState.update {
+            resetTimer(timer, this.getTime())
             it.copy(
                 counting = pomodoroState.isCounting(),
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
-                pomodoroSettings = settings
             )
         }
     }

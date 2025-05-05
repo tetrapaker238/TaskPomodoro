@@ -229,4 +229,26 @@ class PomodoroViewModelTest {
         assertEquals("Start break", state.buttonText)
         assertEquals("10:00", state.timeText)
     }
+
+    @Test
+    fun timeTextWhileBreakAfterUpdatedSettings_OnSecondPassed_TimeTextHasNewTime() {
+        val newPomodoroTime = 50
+        val newBreakTime = 10
+        val newLongBreakTime = 15
+        val newLongBreakInterval = 6
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.updateSettings(
+            PomodoroSettings(
+                pomodoroTime = newPomodoroTime,
+                breakTime = newBreakTime,
+                longBreakTime = newLongBreakTime,
+                longBreakInterval = newLongBreakInterval
+            )
+        )
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.nextTick()
+        state = pomodoroViewModel.uiState.value
+        assertEquals("09:59", state.timeText)
+    }
 }
