@@ -21,6 +21,5 @@ class CreatedPomodoro : PomodoroState() {
     override fun start() {
         this.pomodoroViewModel?.setPomodoroState(StartedPomodoro())
     }
-
-
+    
 }
