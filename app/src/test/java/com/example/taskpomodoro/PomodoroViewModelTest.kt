@@ -3,7 +3,7 @@ package com.example.taskpomodoro
 import com.example.taskpomodoro.model.Timer
 import com.example.taskpomodoro.ui.PomodoroSettings
 import com.example.taskpomodoro.ui.PomodoroViewModel
-import com.example.taskpomodoro.ui.state.EButtonText
+import com.example.taskpomodoro.ui.state.EPomodoroButtonText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -25,9 +25,14 @@ private class FakeTimer(timeInMillis: Long) : Timer {
     private var actualTimeInMillis = timeInMillis
     private var intervalTime = 1000L
     private lateinit var pomodoroViewModel: PomodoroViewModel
-    override fun playTimer() {}
+    private var counting = false
+    override fun playTimer() {
+        this.counting = true
+    }
 
-    override fun stopTimer() {}
+    override fun stopTimer() {
+        this.counting = false
+    }
 
     override fun attach(pomodoroViewModel: PomodoroViewModel): FakeTimer {
         this.pomodoroViewModel = pomodoroViewModel
@@ -45,7 +50,12 @@ private class FakeTimer(timeInMillis: Long) : Timer {
     }
 
     override fun resetTimer(): Timer {
+        this.counting = false
         return this
+    }
+
+    override fun isCounting(): Boolean {
+        return this.counting
     }
 
     fun nextTick() {
@@ -54,6 +64,7 @@ private class FakeTimer(timeInMillis: Long) : Timer {
     }
 
     fun goToFinish() {
+        this.counting = false
         actualTimeInMillis = 0
         pomodoroViewModel.updateStateOnFinish()
     }
@@ -68,7 +79,7 @@ class PomodoroViewModelTest {
     @Test
     fun initialUiState_Construct_NonStartingState() {
         assertEquals("25:00", state.timeText)
-        assertEquals(EButtonText.START.buttonText, state.buttonText)
+        assertEquals("Start ${EPomodoroButtonText.POMODORO.buttonText}", state.buttonText)
         assertFalse(state.counting)
     }
 
@@ -77,7 +88,7 @@ class PomodoroViewModelTest {
         pomodoroViewModel.startPomodoro()
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
-        assertEquals(EButtonText.STOP.buttonText, state.buttonText)
+        assertEquals("Stop ${EPomodoroButtonText.POMODORO.buttonText}", state.buttonText)
     }
 
     @Test
@@ -103,7 +114,7 @@ class PomodoroViewModelTest {
         fakeTimer.goToFinish()
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
-        assertEquals(EButtonText.START_BREAK.buttonText, state.buttonText)
+        assertEquals("Start ${EPomodoroButtonText.BREAK.buttonText}", state.buttonText)
         assertEquals("05:00", state.timeText)
     }
 
@@ -114,7 +125,7 @@ class PomodoroViewModelTest {
         pomodoroViewModel.startPomodoro()
         state = pomodoroViewModel.uiState.value
         assertTrue(state.counting)
-        assertEquals(EButtonText.STOP_BREAK.buttonText, state.buttonText)
+        assertEquals("Stop ${EPomodoroButtonText.BREAK.buttonText}", state.buttonText)
     }
 
     @Test
@@ -136,7 +147,7 @@ class PomodoroViewModelTest {
         pomodoroViewModel.stopPomodoro()
         state = pomodoroViewModel.uiState.value
         assertFalse(state.counting)
-        assertEquals(EButtonText.START_BREAK.buttonText, state.buttonText)
+        assertEquals("Start ${EPomodoroButtonText.BREAK.buttonText}", state.buttonText)
     }
 
     @Test
@@ -162,7 +173,7 @@ class PomodoroViewModelTest {
         assertTrue(pomodoroSettings.longBreakInterval == newLongBreakInterval)
         assertFalse(state.counting)
         assertEquals(state.timeText, "50:00")
-        assertEquals(state.buttonText, "Start pomodoro")
+        assertEquals("Start ${EPomodoroButtonText.POMODORO.buttonText}", state.buttonText)
         assertFalse(state.showDialog)
     }
 
@@ -203,7 +214,7 @@ class PomodoroViewModelTest {
             )
         )
         state = pomodoroViewModel.uiState.value
-        assertEquals("Start pomodoro", state.buttonText)
+        assertEquals("Start ${EPomodoroButtonText.POMODORO.buttonText}", state.buttonText)
         assertEquals("50:00", state.timeText)
     }
 
@@ -226,7 +237,7 @@ class PomodoroViewModelTest {
             )
         )
         state = pomodoroViewModel.uiState.value
-        assertEquals("Start break", state.buttonText)
+        assertEquals("Start ${EPomodoroButtonText.BREAK.buttonText}", state.buttonText)
         assertEquals("10:00", state.timeText)
     }
 

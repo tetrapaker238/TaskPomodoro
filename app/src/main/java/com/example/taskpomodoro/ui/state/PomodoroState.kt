@@ -2,20 +2,21 @@ package com.example.taskpomodoro.ui.state
 
 import com.example.taskpomodoro.ui.PomodoroViewModel
 
-abstract class PomodoroState : IPomodoroState {
+abstract class PomodoroState(val stateType: EPomodoroButtonText) :
+    IPomodoroState {
 
     override var pomodoroViewModel: PomodoroViewModel? = null
 
-    abstract override fun finish()
+    override fun getButtonText(): String {
+        val countPart: String =
+            if (this.pomodoroViewModel?.timer?.isCounting() == true) "Stop" else "Start"
+        return "$countPart ${stateType.buttonText}"
+    }
 
-    abstract override fun getButtonText(): String
+    abstract override fun getInitialTime(): Int
 
     abstract override fun isOnBreak(): Boolean
 
-    abstract override fun stop()
-
-    abstract override fun start()
-
-    abstract override fun isCounting(): Boolean
+    abstract override fun goNextTimerState()
 
 }

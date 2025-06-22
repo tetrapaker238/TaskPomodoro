@@ -3,8 +3,8 @@ package com.example.taskpomodoro.ui
 import androidx.lifecycle.ViewModel
 import com.example.taskpomodoro.model.PomodoroTimer
 import com.example.taskpomodoro.model.Timer
-import com.example.taskpomodoro.ui.state.CreatedPomodoro
 import com.example.taskpomodoro.ui.state.PomodoroState
+import com.example.taskpomodoro.ui.state.PomodoroTimerState
 import com.example.taskpomodoro.utils.convertMinutesToMilliseconds
 import com.example.taskpomodoro.utils.getTimeFromMs
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,10 +16,10 @@ class PomodoroViewModel(
     initialTimer: Timer? = null
 ) : ViewModel() {
     private lateinit var pomodoroState: PomodoroState
-    private val timer: Timer
+    internal val timer: Timer
 
     init {
-        setPomodoroState(CreatedPomodoro())
+        setPomodoroState(PomodoroTimerState())
     }
 
     fun setPomodoroState(newPomodoroState: PomodoroState) {
@@ -31,7 +31,7 @@ class PomodoroViewModel(
         PomodoroUiState(
             getTimeFromMs(convertMinutesToMilliseconds(PomodoroSettings().pomodoroTime)),
             pomodoroState.getButtonText(),
-            pomodoroState.isCounting(),
+            counting = false,
             showDialog = false,
             PomodoroSettings()
         )
@@ -62,16 +62,14 @@ class PomodoroViewModel(
         return timer?.setTotalTimeInMs(timeInMs)?.resetTimer()
     }
 
-    private fun getTime(): Int {
-        return if (pomodoroState.isOnBreak()) uiState.value.pomodoroSettings.breakTime else uiState.value.pomodoroSettings.pomodoroTime
+    private fun getInitialTime(): Int {
+        return pomodoroState.getInitialTime()
     }
 
 
     private fun getTimeText(): String {
-        // TODO: Remove the .isOnBreak dependency, and get the settings break time or pomodoroTime
-        //  when corresponding instead
         val newTime =
-            convertMinutesToMilliseconds(this.getTime())
+            convertMinutesToMilliseconds(this.getInitialTime())
         return getTimeFromMs(newTime)
     }
 
@@ -81,11 +79,11 @@ class PomodoroViewModel(
     }
 
     internal fun updateStateOnFinish() {
-        pomodoroState.finish()
+        this.pomodoroState.goNextTimerState()
         resetTimer(timer)
         _uiState.update {
             it.copy(
-                counting = pomodoroState.isCounting(),
+                counting = false,
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
             )
@@ -94,22 +92,21 @@ class PomodoroViewModel(
 
 
     fun startPomodoro() {
-        pomodoroState.start()
+        timer.playTimer()
         _uiState.update {
             it.copy(
-                counting = pomodoroState.isCounting(),
+                counting = true,
                 buttonText = pomodoroState.getButtonText(),
             )
         }
-        timer.playTimer()
     }
 
     fun stopPomodoro() {
-        pomodoroState.stop()
         timer.stopTimer()
         _uiState.update {
             it.copy(
-                counting = pomodoroState.isCounting(), buttonText = pomodoroState.getButtonText()
+                counting = false,
+                buttonText = pomodoroState.getButtonText()
             )
         }
     }
@@ -123,14 +120,13 @@ class PomodoroViewModel(
     }
 
     fun updateSettings(settings: PomodoroSettings) {
-        pomodoroState.stop()
         _uiState.update {
             it.copy(pomodoroSettings = settings)
         }
         _uiState.update {
-            resetTimer(timer, this.getTime())
+            resetTimer(timer, this.getInitialTime())
             it.copy(
-                counting = pomodoroState.isCounting(),
+                counting = false,
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
             )

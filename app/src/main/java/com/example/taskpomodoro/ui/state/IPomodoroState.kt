@@ -11,18 +11,6 @@ interface IPomodoroState {
     fun getButtonText(): String
 
     /**
-     * Handles logic for finishing the current session or break,
-     * transitioning to the next appropriate state.
-     */
-    fun finish()
-
-    /**
-     * Indicates whether the timer is currently counting.
-     * @return true if the timer is active, false otherwise.
-     */
-    fun isCounting(): Boolean
-
-    /**
      * Indicates whether the current state is a break.
      * @return true if the timer is on a break, false otherwise.
      */
@@ -35,12 +23,12 @@ interface IPomodoroState {
     var pomodoroViewModel: PomodoroViewModel?
 
     /**
-     * Triggers logic for entering a running state.
+     * Gets the initial time for the actual timer
      */
-    fun start()
+    fun getInitialTime(): Int
 
     /**
-     * Triggers logic for exiting a running state.
+     * Sets the next timer state given the actual state
      */
-    fun stop()
+    fun goNextTimerState()
 }

@@ -1,4 +1,5 @@
 package com.example.taskpomodoro.model
+
 import com.example.taskpomodoro.ui.PomodoroViewModel
 
 interface Timer {
@@ -8,4 +9,5 @@ interface Timer {
     fun setTotalTimeInMs(newTimeInMs: Long): Timer
     fun setIntervalTime(newIntervalTime: Long): Timer
     fun resetTimer(): Timer
+    fun isCounting(): Boolean
 }

@@ -46,4 +46,8 @@ class PomodoroTimer(
         stoppableCountDownTimer?.resetTimer(this.timeInMillis, intervalTime)
         return this
     }
+
+    override fun isCounting(): Boolean {
+        return this.stoppableCountDownTimer?.started == true
+    }
 }
