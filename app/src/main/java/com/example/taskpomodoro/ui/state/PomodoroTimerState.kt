@@ -11,9 +11,11 @@ class PomodoroTimerState : PomodoroState(EPomodoroButtonText.POMODORO) {
     }
 
     override fun goNextTimerState() {
-        //TODO: Change to long break timer when long break interval condition has met given the
-        // amount of pomodoros done inside the uiState value
-        this.pomodoroViewModel?.setPomodoroState(BreakTimerState())
+        if (this.pomodoroViewModel?.uiState?.value?.finishedPomodoros == this.pomodoroViewModel?.uiState?.value?.pomodoroSettings?.longBreakInterval) {
+            this.pomodoroViewModel?.setPomodoroState(LongBreakTimerState())
+        } else {
+            this.pomodoroViewModel?.setPomodoroState(BreakTimerState())
+        }
     }
 
 }

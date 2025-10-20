@@ -33,7 +33,7 @@ class PomodoroViewModel(
             pomodoroState.getButtonText(),
             counting = false,
             showDialog = false,
-            PomodoroSettings()
+            pomodoroSettings = PomodoroSettings()
         )
     )
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
@@ -86,6 +86,7 @@ class PomodoroViewModel(
                 counting = false,
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
+                finishedPomodoros = it.finishedPomodoros + 1
             )
         }
     }

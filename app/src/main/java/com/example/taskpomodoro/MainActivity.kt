@@ -91,9 +91,18 @@ fun Toolbar(modifier: Modifier = Modifier, onSettingsClick: () -> Unit) {
 fun TimeDisplay(pomodoroViewModel: PomodoroViewModel) {
     ButtonAndTime(
         modifier = Modifier
-            .fillMaxSize()
             .wrapContentSize(align = Alignment.Center),
         pomodoroViewModel = pomodoroViewModel
+    )
+}
+
+@Composable
+fun FinishedPomodoroText(pomodoroViewModel: PomodoroViewModel) {
+    val pomodoroUiState by pomodoroViewModel.uiState.collectAsState()
+    Text(
+        text = pomodoroUiState.finishedPomodoros.toString()
+                + " / "
+                + pomodoroUiState.pomodoroSettings.longBreakInterval.toString(),
     )
 }
 
@@ -133,14 +142,23 @@ fun PomodoroScreen(
     val pomodoroUiState: PomodoroUiState by pomodoroViewModel.uiState.collectAsState()
     // pomodoroViewModel Ui State the collectAsState getter
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize(),
     ) {
-        Row(verticalAlignment = Alignment.Top) {
-            Toolbar(onSettingsClick = { pomodoroViewModel.toggleDialog() })
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Toolbar(
+            modifier = Modifier.align(Alignment.TopCenter),
+            onSettingsClick = { pomodoroViewModel.toggleDialog() }
+        )
+
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             TimeDisplay(pomodoroViewModel = pomodoroViewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+            FinishedPomodoroText(pomodoroViewModel = pomodoroViewModel)
         }
+
 
         if (pomodoroUiState.showDialog) {
             DialogWithForm(
