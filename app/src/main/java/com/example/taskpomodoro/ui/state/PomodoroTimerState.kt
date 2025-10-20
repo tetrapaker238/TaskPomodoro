@@ -11,7 +11,9 @@ class PomodoroTimerState : PomodoroState(EPomodoroButtonText.POMODORO) {
     }
 
     override fun goNextTimerState() {
-        if (this.pomodoroViewModel?.uiState?.value?.finishedPomodoros == this.pomodoroViewModel?.uiState?.value?.pomodoroSettings?.longBreakInterval) {
+        if (this.pomodoroViewModel?.uiState?.value?.finishedPomodoros
+            == this.pomodoroViewModel?.uiState?.value?.pomodoroSettings?.longBreakInterval
+        ) {
             this.pomodoroViewModel?.setPomodoroState(LongBreakTimerState())
         } else {
             this.pomodoroViewModel?.setPomodoroState(BreakTimerState())

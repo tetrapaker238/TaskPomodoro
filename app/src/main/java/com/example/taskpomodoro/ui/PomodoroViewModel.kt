@@ -79,6 +79,11 @@ class PomodoroViewModel(
     }
 
     internal fun updateStateOnFinish() {
+        _uiState.update {
+            it.copy(
+                finishedPomodoros = it.finishedPomodoros + 1
+            )
+        }
         this.pomodoroState.goNextTimerState()
         resetTimer(timer)
         _uiState.update {
@@ -86,7 +91,6 @@ class PomodoroViewModel(
                 counting = false,
                 buttonText = pomodoroState.getButtonText(),
                 timeText = getTimeText(),
-                finishedPomodoros = it.finishedPomodoros + 1
             )
         }
     }
