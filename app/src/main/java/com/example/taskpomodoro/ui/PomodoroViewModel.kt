@@ -79,9 +79,11 @@ class PomodoroViewModel(
     }
 
     internal fun updateStateOnFinish() {
+        val isPomodoroFinished =
+            uiState.value.finishedPomodoros == uiState.value.pomodoroSettings.longBreakInterval
         _uiState.update {
             it.copy(
-                finishedPomodoros = it.finishedPomodoros + 1
+                finishedPomodoros = if (isPomodoroFinished) 0 else it.finishedPomodoros + 1
             )
         }
         this.pomodoroState.goNextTimerState()
