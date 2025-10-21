@@ -284,4 +284,57 @@ class PomodoroViewModelTest {
         assertEquals("Start ${EPomodoroButtonText.LONG_BREAK.buttonText}", state.buttonText)
         assertEquals(1, state.finishedPomodoros)
     }
+
+    @Test
+    fun pomodoroState_StartedLongBreakState_UpdateLongBreakState() {
+        val newPomodoroTime = 1
+        val newBreakTime = 1
+        val newLongBreakTime = 1
+        val newLongBreakInterval = 1
+        pomodoroViewModel.updateSettings(
+            PomodoroSettings(
+                pomodoroTime = newPomodoroTime,
+                breakTime = newBreakTime,
+                longBreakTime = newLongBreakTime,
+                longBreakInterval = newLongBreakInterval
+            )
+        )
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.startPomodoro()
+        state = pomodoroViewModel.uiState.value
+        assertTrue(state.counting)
+        assertEquals(
+            "Stop ${EPomodoroButtonText.LONG_BREAK.buttonText}",
+            state.buttonText
+        )
+        assertEquals(1, state.finishedPomodoros)
+    }
+
+    @Test
+    fun pomodoroState_FinishedLongBreakState_ResetPomodoroState() {
+        val newPomodoroTime = 1
+        val newBreakTime = 1
+        val newLongBreakTime = 1
+        val newLongBreakInterval = 1
+        pomodoroViewModel.updateSettings(
+            PomodoroSettings(
+                pomodoroTime = newPomodoroTime,
+                breakTime = newBreakTime,
+                longBreakTime = newLongBreakTime,
+                longBreakInterval = newLongBreakInterval
+            )
+        )
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        pomodoroViewModel.startPomodoro()
+        fakeTimer.goToFinish()
+        state = pomodoroViewModel.uiState.value
+        assertFalse(state.counting)
+        assertEquals(
+            "Start ${EPomodoroButtonText.POMODORO.buttonText}",
+            state.buttonText
+        )
+        assertEquals(0, state.finishedPomodoros)
+    }
 }
