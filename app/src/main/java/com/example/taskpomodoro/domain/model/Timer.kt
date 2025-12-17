@@ -8,5 +8,4 @@ interface Timer {
     fun setIntervalTime(newIntervalTime: Long): Timer
     fun resetTimer(): Timer
     fun isCounting(): Boolean
-    fun destroyTimer()
 }

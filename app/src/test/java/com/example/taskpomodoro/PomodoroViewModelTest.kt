@@ -2,6 +2,7 @@ package com.example.taskpomodoro
 
 import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.domain.model.Timer
+import com.example.taskpomodoro.domain.model.TimerListener
 import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 import com.example.taskpomodoro.ui.state.EPomodoroButtonText
 import org.junit.Assert.assertEquals
@@ -24,7 +25,7 @@ private class FakeTimer(timeInMillis: Long) : Timer {
 
     private var actualTimeInMillis = timeInMillis
     private var intervalTime = 1000L
-    private lateinit var pomodoroViewModel: PomodoroViewModel
+    private lateinit var pomodoroViewModel: TimerListener
     private var counting = false
     override fun playTimer() {
         this.counting = true
@@ -34,8 +35,8 @@ private class FakeTimer(timeInMillis: Long) : Timer {
         this.counting = false
     }
 
-    override fun attach(pomodoroViewModel: PomodoroViewModel): FakeTimer {
-        this.pomodoroViewModel = pomodoroViewModel
+    override fun setListener(timerListener: TimerListener): Timer {
+        this.pomodoroViewModel = timerListener
         return this
     }
 
@@ -58,15 +59,16 @@ private class FakeTimer(timeInMillis: Long) : Timer {
         return this.counting
     }
 
+
     fun nextTick() {
         actualTimeInMillis -= 1000
-        pomodoroViewModel.updateTimeText(actualTimeInMillis)
+        pomodoroViewModel.onTimerTick(actualTimeInMillis)
     }
 
     fun goToFinish() {
         this.counting = false
         actualTimeInMillis = 0
-        pomodoroViewModel.updateStateOnFinish()
+        pomodoroViewModel.onTimerFinish()
     }
 }
 

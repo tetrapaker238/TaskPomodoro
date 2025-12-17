@@ -31,11 +31,6 @@ class PomodoroTimer(
         return this
     }
 
-    override fun destroyTimer() {
-        stoppableCountDownTimer?.stopTimer()
-        stoppableCountDownTimer = null
-    }
-
     override fun setTotalTimeInMs(newTimeInMs: Long): Timer {
         this.timeInMillis = newTimeInMs
         return this
