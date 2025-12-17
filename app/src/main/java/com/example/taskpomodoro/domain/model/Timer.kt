@@ -1,4 +1,4 @@
-package com.example.taskpomodoro.model
+package com.example.taskpomodoro.domain.model
 
 import com.example.taskpomodoro.ui.PomodoroViewModel
 
