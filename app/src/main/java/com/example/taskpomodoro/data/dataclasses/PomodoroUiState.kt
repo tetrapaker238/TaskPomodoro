@@ -1,4 +1,4 @@
-package com.example.taskpomodoro.ui
+package com.example.taskpomodoro.data.dataclasses
 
 data class PomodoroUiState(
     val timeText: String,

@@ -1,7 +1,7 @@
 package com.example.taskpomodoro
 
+import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.domain.model.Timer
-import com.example.taskpomodoro.ui.PomodoroSettings
 import com.example.taskpomodoro.ui.PomodoroViewModel
 import com.example.taskpomodoro.ui.state.EPomodoroButtonText
 import org.junit.Assert.assertEquals

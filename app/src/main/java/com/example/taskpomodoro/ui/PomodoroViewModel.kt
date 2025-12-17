@@ -1,6 +1,8 @@
 package com.example.taskpomodoro.ui
 
 import androidx.lifecycle.ViewModel
+import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
+import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
 import com.example.taskpomodoro.domain.model.PomodoroTimer
 import com.example.taskpomodoro.domain.model.Timer
 import com.example.taskpomodoro.ui.state.PomodoroState

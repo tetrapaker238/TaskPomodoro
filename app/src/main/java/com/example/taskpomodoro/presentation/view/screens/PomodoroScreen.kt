@@ -12,11 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
 import com.example.taskpomodoro.presentation.view.composables.DialogWithForm
 import com.example.taskpomodoro.presentation.view.composables.FinishedPomodoroText
 import com.example.taskpomodoro.presentation.view.composables.TimeDisplay
 import com.example.taskpomodoro.presentation.view.composables.Toolbar
-import com.example.taskpomodoro.ui.PomodoroUiState
 import com.example.taskpomodoro.ui.PomodoroViewModel
 
 @Composable
