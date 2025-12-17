@@ -1,6 +1,6 @@
 package com.example.taskpomodoro.ui.state
 
-import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
+import com.example.taskpomodoro.domain.model.TimerKeeper
 
 interface IPomodoroState {
 
@@ -16,11 +16,8 @@ interface IPomodoroState {
      */
     fun isOnBreak(): Boolean
 
-    /**
-     * Reference to the [PomodoroViewModel] managing the timer state.
-     * This allows the state to trigger changes in the ViewModel.
-     */
-    var pomodoroViewModel: PomodoroViewModel?
+
+    var timerKeeper: TimerKeeper?
 
     /**
      * Gets the initial time for the actual timer
@@ -31,4 +28,9 @@ interface IPomodoroState {
      * Sets the next timer state given the actual state
      */
     fun goNextTimerState()
+
+    /**
+     * Handles the timer button click.
+     */
+    fun onTimerButtonClicked()
 }

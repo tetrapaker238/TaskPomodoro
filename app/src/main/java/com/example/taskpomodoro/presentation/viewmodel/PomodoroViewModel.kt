@@ -5,6 +5,8 @@ import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
 import com.example.taskpomodoro.domain.model.PomodoroTimer
 import com.example.taskpomodoro.domain.model.Timer
+import com.example.taskpomodoro.domain.model.TimerKeeper
+import com.example.taskpomodoro.domain.model.TimerListener
 import com.example.taskpomodoro.ui.state.PomodoroState
 import com.example.taskpomodoro.ui.state.PomodoroTimerState
 import com.example.taskpomodoro.utils.convertMinutesToMilliseconds
@@ -16,17 +18,17 @@ import kotlinx.coroutines.flow.update
 
 class PomodoroViewModel(
     initialTimer: Timer? = null
-) : ViewModel() {
+) : ViewModel(), TimerListener, TimerKeeper {
     private lateinit var pomodoroState: PomodoroState
-    internal val timer: Timer
+    override val timer: Timer
 
     init {
         setPomodoroState(PomodoroTimerState())
     }
 
-    fun setPomodoroState(newPomodoroState: PomodoroState) {
+    override fun setPomodoroState(newPomodoroState: PomodoroState) {
         this.pomodoroState = newPomodoroState
-        this.pomodoroState.pomodoroViewModel = this
+        this.pomodoroState.timerKeeper = this
     }
 
     private val _uiState = MutableStateFlow(
@@ -38,14 +40,14 @@ class PomodoroViewModel(
             pomodoroSettings = PomodoroSettings()
         )
     )
-    val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
+    override val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
     init {
-        this.timer = initialTimer?.attach(this) ?: PomodoroTimer(
+        this.timer = initialTimer?.setListener(this) ?: PomodoroTimer(
             convertMinutesToMilliseconds(
                 uiState.value.pomodoroSettings.pomodoroTime
             )
-        ).attach(
+        ).setListener(
             this
         )
     }
@@ -140,5 +142,13 @@ class PomodoroViewModel(
                 timeText = getTimeText(),
             )
         }
+    }
+
+    override fun onTimerTick(millisUntilFinished: Long) {
+        updateTimeText(millisUntilFinished)
+    }
+
+    override fun onTimerFinish() {
+        updateStateOnFinish()
     }
 }

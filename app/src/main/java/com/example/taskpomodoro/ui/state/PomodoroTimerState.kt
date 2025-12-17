@@ -3,7 +3,7 @@ package com.example.taskpomodoro.ui.state
 class PomodoroTimerState : PomodoroState(EPomodoroButtonText.POMODORO) {
 
     override fun getInitialTime(): Int {
-        return this.pomodoroViewModel?.uiState?.value?.pomodoroSettings?.pomodoroTime ?: -1
+        return this.timerKeeper?.uiState?.value?.pomodoroSettings?.pomodoroTime ?: -1
     }
 
     override fun isOnBreak(): Boolean {
@@ -11,12 +11,12 @@ class PomodoroTimerState : PomodoroState(EPomodoroButtonText.POMODORO) {
     }
 
     override fun goNextTimerState() {
-        if (this.pomodoroViewModel?.uiState?.value?.finishedPomodoros
-            == this.pomodoroViewModel?.uiState?.value?.pomodoroSettings?.longBreakInterval
+        if (this.timerKeeper?.uiState?.value?.finishedPomodoros
+            == this.timerKeeper?.uiState?.value?.pomodoroSettings?.longBreakInterval
         ) {
-            this.pomodoroViewModel?.setPomodoroState(LongBreakTimerState())
+            this.timerKeeper?.setPomodoroState(LongBreakTimerState())
         } else {
-            this.pomodoroViewModel?.setPomodoroState(BreakTimerState())
+            this.timerKeeper?.setPomodoroState(BreakTimerState())
         }
     }
 

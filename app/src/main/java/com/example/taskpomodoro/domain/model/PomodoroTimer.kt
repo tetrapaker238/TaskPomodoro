@@ -1,6 +1,5 @@
 package com.example.taskpomodoro.domain.model
 
-import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 import com.example.taskpomodoro.utils.StoppableCountDownTimer
 
 class PomodoroTimer(
@@ -18,18 +17,23 @@ class PomodoroTimer(
         stoppableCountDownTimer?.stopTimer()
     }
 
-    override fun attach(pomodoroViewModel: PomodoroViewModel): PomodoroTimer {
+    override fun setListener(timerListener: TimerListener): PomodoroTimer {
         stoppableCountDownTimer =
             object : StoppableCountDownTimer(timeInMillis, intervalTime) {
                 override fun onTimerTick(millisUntilFinished: Long) {
-                    pomodoroViewModel.updateTimeText(millisUntilFinished)
+                    timerListener.onTimerTick(millisUntilFinished)
                 }
 
                 override fun onTimerFinish() {
-                    pomodoroViewModel.updateStateOnFinish()
+                    timerListener.onTimerFinish()
                 }
             }
         return this
+    }
+
+    override fun destroyTimer() {
+        stoppableCountDownTimer?.stopTimer()
+        stoppableCountDownTimer = null
     }
 
     override fun setTotalTimeInMs(newTimeInMs: Long): Timer {
