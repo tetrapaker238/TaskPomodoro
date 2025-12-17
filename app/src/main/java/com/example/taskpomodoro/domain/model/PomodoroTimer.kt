@@ -1,6 +1,6 @@
 package com.example.taskpomodoro.domain.model
 
-import com.example.taskpomodoro.ui.PomodoroViewModel
+import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 import com.example.taskpomodoro.utils.StoppableCountDownTimer
 
 class PomodoroTimer(

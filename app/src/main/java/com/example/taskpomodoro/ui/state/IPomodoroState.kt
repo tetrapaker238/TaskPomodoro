@@ -1,6 +1,6 @@
 package com.example.taskpomodoro.ui.state
 
-import com.example.taskpomodoro.ui.PomodoroViewModel
+import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 
 interface IPomodoroState {
 

@@ -17,7 +17,7 @@ import com.example.taskpomodoro.presentation.view.composables.DialogWithForm
 import com.example.taskpomodoro.presentation.view.composables.FinishedPomodoroText
 import com.example.taskpomodoro.presentation.view.composables.TimeDisplay
 import com.example.taskpomodoro.presentation.view.composables.Toolbar
-import com.example.taskpomodoro.ui.PomodoroViewModel
+import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 
 @Composable
 fun PomodoroScreen(

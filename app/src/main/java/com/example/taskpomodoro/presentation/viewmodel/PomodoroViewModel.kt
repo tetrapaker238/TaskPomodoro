@@ -1,4 +1,4 @@
-package com.example.taskpomodoro.ui
+package com.example.taskpomodoro.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
