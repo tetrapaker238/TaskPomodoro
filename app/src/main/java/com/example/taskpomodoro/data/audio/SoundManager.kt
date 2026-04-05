@@ -9,7 +9,7 @@ class SoundManager(context: Context): SoundProvider {
 
     val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(2).setAudioAttributes(
         AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(
-            AudioAttributes.USAGE_NOTIFICATION).build()).build()
+            AudioAttributes.USAGE_MEDIA).build()).build()
     val soundIdInicio = soundPool.load(context, com.example.taskpomodoro.R.raw.inicio_pomodoro, 1)
     val soundIdPausa = soundPool.load(context, com.example.taskpomodoro.R.raw.pausa_pomodoro, 1)
     val soundIdFin = soundPool.load(context, com.example.taskpomodoro.R.raw.fin_pomodoro, 1)
