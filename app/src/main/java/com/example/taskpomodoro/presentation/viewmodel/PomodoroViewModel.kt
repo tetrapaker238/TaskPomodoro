@@ -1,8 +1,12 @@
 package com.example.taskpomodoro.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
+import com.example.taskpomodoro.domain.audio.SoundProvider
 import com.example.taskpomodoro.domain.model.PomodoroTimer
 import com.example.taskpomodoro.domain.model.Timer
 import com.example.taskpomodoro.domain.model.TimerKeeper
@@ -15,10 +19,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import com.example.taskpomodoro.data.audio.SoundManager
 
 class PomodoroViewModel(
-    initialTimer: Timer? = null
+    initialTimer: Timer? = null,
+    val soundProvider: SoundProvider? = null
 ) : ViewModel(), TimerListener, TimerKeeper {
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = checkNotNull(this[APPLICATION_KEY])
+                val soundManager = SoundManager(application.applicationContext)
+                PomodoroViewModel(soundProvider = soundManager)
+            }
+        }
+    }
+
     private lateinit var pomodoroState: PomodoroState
     override val timer: Timer
 
@@ -103,6 +121,7 @@ class PomodoroViewModel(
 
 
     fun startPomodoro() {
+        this.soundProvider?.playInitSound()
         timer.playTimer()
         _uiState.update {
             it.copy(
@@ -113,6 +132,7 @@ class PomodoroViewModel(
     }
 
     fun stopPomodoro() {
+        this.soundProvider?.playStopSound()
         timer.stopTimer()
         _uiState.update {
             it.copy(
@@ -149,6 +169,7 @@ class PomodoroViewModel(
     }
 
     override fun onTimerFinish() {
+        soundProvider?.playFinishSound()
         updateStateOnFinish()
     }
 }

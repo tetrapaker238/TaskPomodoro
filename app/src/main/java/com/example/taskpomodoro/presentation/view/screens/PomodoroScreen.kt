@@ -21,7 +21,7 @@ import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 
 @Composable
 fun PomodoroScreen(
-    modifier: Modifier = Modifier, pomodoroViewModel: PomodoroViewModel = viewModel()
+    modifier: Modifier = Modifier, pomodoroViewModel: PomodoroViewModel = viewModel(factory = PomodoroViewModel.Factory)
 ) {
     val pomodoroUiState: PomodoroUiState by pomodoroViewModel.uiState.collectAsState()
     // pomodoroViewModel Ui State the collectAsState getter
