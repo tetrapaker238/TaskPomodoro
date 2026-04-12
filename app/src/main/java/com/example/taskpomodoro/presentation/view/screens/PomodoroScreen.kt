@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
 import com.example.taskpomodoro.presentation.view.composables.DialogWithForm
 import com.example.taskpomodoro.presentation.view.composables.FinishedPomodoroText
+import com.example.taskpomodoro.presentation.view.composables.TaskTextbar
 import com.example.taskpomodoro.presentation.view.composables.TimeDisplay
 import com.example.taskpomodoro.presentation.view.composables.Toolbar
 import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
@@ -41,6 +42,8 @@ fun PomodoroScreen(
             TimeDisplay(pomodoroViewModel = pomodoroViewModel)
             Spacer(modifier = Modifier.height(16.dp))
             FinishedPomodoroText(pomodoroViewModel = pomodoroViewModel)
+            Spacer(modifier.height(24.dp))
+            TaskTextbar(onClickedTextBar = {})
         }
 
 
