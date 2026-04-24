@@ -1,10 +1,12 @@
 package com.example.taskpomodoro.presentation.view.screens
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,7 +18,6 @@ import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
 import com.example.taskpomodoro.presentation.view.composables.DialogWithForm
 import com.example.taskpomodoro.presentation.view.composables.FinishedPomodoroText
 import com.example.taskpomodoro.presentation.view.composables.TaskSection
-import com.example.taskpomodoro.presentation.view.composables.TaskTextbar
 import com.example.taskpomodoro.presentation.view.composables.TimeDisplay
 import com.example.taskpomodoro.presentation.view.composables.Toolbar
 import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
@@ -27,18 +28,20 @@ fun PomodoroScreen(
 ) {
     val pomodoroUiState: PomodoroUiState by pomodoroViewModel.uiState.collectAsState()
     // pomodoroViewModel Ui State the collectAsState getter
-    Box(
+    Scaffold(
+        topBar = {
+            Toolbar(
+                onSettingsClick = { pomodoroViewModel.toggleDialog() }
+            )
+        },
         modifier = modifier
             .fillMaxSize(),
     ) {
-        Toolbar(
-            modifier = Modifier.align(Alignment.TopCenter),
-            onSettingsClick = { pomodoroViewModel.toggleDialog() }
-        )
-
+        innerPadding ->
         Column(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.padding(innerPadding).fillMaxSize(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             TimeDisplay(pomodoroViewModel = pomodoroViewModel)
             Spacer(modifier = Modifier.height(16.dp))
@@ -50,6 +53,7 @@ fun PomodoroScreen(
 
         if (pomodoroUiState.showDialog) {
             DialogWithForm(
+                modifier = Modifier.padding(innerPadding),
                 initialSettings = pomodoroUiState.pomodoroSettings,
                 updateState = { newSettings ->
                     pomodoroViewModel.updateSettings(newSettings)
