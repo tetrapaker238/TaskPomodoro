@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.example.taskpomodoro.presentation.view.screens.PomodoroScreen
+import com.example.taskpomodoro.presentation.navigation.AppNavigation
 import com.example.taskpomodoro.ui.theme.TaskPomodoroTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    PomodoroScreen()
+                    AppNavigation()
                 }
             }
         }
