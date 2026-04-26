@@ -3,6 +3,7 @@ package com.example.taskpomodoro.presentation.view.composables
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,13 +28,18 @@ fun ButtonAndTime(
             style = MaterialTheme.typography.displayMedium,
             text = pomodoroUiState.timeText,
         )
-        Button(onClick = {
-            if (!pomodoroUiState.counting) {
-                pomodoroViewModel.startPomodoro()
-            } else {
-                pomodoroViewModel.stopPomodoro()
-            }
-        }) {
+        Button(
+            onClick = {
+                if (!pomodoroUiState.counting) {
+                    pomodoroViewModel.startPomodoro()
+                } else {
+                    pomodoroViewModel.stopPomodoro()
+                }
+            }, colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        ) {
             Text(
                 text = pomodoroUiState.buttonText, style = MaterialTheme.typography.titleLarge
             )
