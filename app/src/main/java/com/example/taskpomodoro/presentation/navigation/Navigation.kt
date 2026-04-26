@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -30,42 +31,20 @@ import com.example.taskpomodoro.presentation.view.screens.TasksScreen
 import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(
     pomodoroViewModel: PomodoroViewModel = viewModel(factory = PomodoroViewModel.Factory)
 ) {
     val backStack = rememberNavBackStack(Routes.PomodoroKey(null))
 
-    // Determine title based on current backStack key
+    // Determine current backStack key
     val currentKey = backStack.lastOrNull()
-    val title = when (currentKey) {
-        is Routes.PomodoroKey -> "Pomodoro timer"
-        is Routes.TasksKey -> "Task management"
-        else -> "Task Pomodoro"
-    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                title = { Text(title) },
-                actions = {
-                    // Only show settings button if we are on the Pomodoro screen
-                    if (currentKey is Routes.PomodoroKey) {
-                        IconButton(onClick = { pomodoroViewModel.toggleDialog() }) {
-                            Icon(
-                                painter = painterResource(R.drawable.settings_24px),
-                                contentDescription = "Configure pomodoro",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(48.dp)
-                            )
-                        }
-                    }
-                }
+            AppTopBar(
+                currentKey = currentKey,
+                onSettingsClick = { pomodoroViewModel.toggleDialog() }
             )
         },
         bottomBar = {
@@ -112,4 +91,35 @@ fun AppNavigation(
             },
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppTopBar(currentKey: NavKey?, onSettingsClick: () -> Unit) {
+    val title = when (currentKey) {
+        is Routes.PomodoroKey -> "Pomodoro timer"
+        is Routes.TasksKey -> "Task management"
+        else -> "Task Pomodoro"
+    }
+
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        title = { Text(title) },
+        actions = {
+            // Only show settings button if we are on the Pomodoro screen
+            if (currentKey is Routes.PomodoroKey) {
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.settings_24px),
+                        contentDescription = "Configure pomodoro",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+        }
+    )
 }
