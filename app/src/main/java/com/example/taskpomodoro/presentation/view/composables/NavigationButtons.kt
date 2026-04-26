@@ -15,10 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.example.taskpomodoro.R
+import com.example.taskpomodoro.core.ex.navigateTo
+import com.example.taskpomodoro.presentation.navigation.Routes
 
 @Composable
-fun NavigationButtons(modifier: Modifier = Modifier) {
+fun NavigationButtons(modifier: Modifier = Modifier, backStack: NavBackStack<NavKey>) {
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         val navigationButtonModifier = Modifier
@@ -26,14 +30,14 @@ fun NavigationButtons(modifier: Modifier = Modifier) {
             .fillMaxHeight()
         NavigationButton(
             modifier = navigationButtonModifier,
-            onClick = {},
+            onClick = {backStack.navigateTo(Routes.PomodoroKey(null))},
             resourceId = R.drawable.alarm_on_24px,
             contentDescription = "Pomodoro section",
             label = "Pomodoro"
         )
         NavigationButton(
             modifier = navigationButtonModifier,
-            onClick = {},
+            onClick = { backStack.navigateTo(Routes.TasksKey) },
             resourceId = R.drawable.assignment_24px,
             contentDescription = "Task section",
             label = "Tasks"

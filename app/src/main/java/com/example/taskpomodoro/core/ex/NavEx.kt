@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 fun NavBackStack<NavKey>.navigateTo(screen: NavKey) {
+    if (screen in this) return this.backTo(screen)
     add(screen)
 }
 

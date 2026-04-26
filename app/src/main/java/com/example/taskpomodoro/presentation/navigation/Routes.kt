@@ -10,5 +10,6 @@ sealed class Routes: NavKey {
     @Serializable
     data object Error: Routes()
 
-
+    @Serializable
+    data object TasksKey: Routes()
 }
