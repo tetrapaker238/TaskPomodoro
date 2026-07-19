@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
-import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
+import com.example.taskpomodoro.domain.dataclasses.PomodoroSettings
+import com.example.taskpomodoro.ui.state.PomodoroUiState
 import com.example.taskpomodoro.domain.audio.SoundProvider
 import com.example.taskpomodoro.domain.model.PomodoroTimer
 import com.example.taskpomodoro.domain.model.Timer

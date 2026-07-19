@@ -1,4 +1,6 @@
-package com.example.taskpomodoro.data.dataclasses
+package com.example.taskpomodoro.ui.state
+
+import com.example.taskpomodoro.domain.dataclasses.PomodoroSettings
 
 data class PomodoroUiState(
     val timeText: String,
@@ -7,11 +9,4 @@ data class PomodoroUiState(
     val showDialog: Boolean = false,
     val finishedPomodoros: Int = 0,
     val pomodoroSettings: PomodoroSettings = PomodoroSettings(20, 5, 10, 4)
-)
-
-data class PomodoroSettings(
-    val pomodoroTime: Int = 25,
-    val breakTime: Int = 5,
-    val longBreakTime: Int = 10,
-    val longBreakInterval: Int = 4,
 )

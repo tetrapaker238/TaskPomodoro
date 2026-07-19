@@ -1,6 +1,6 @@
 package com.example.taskpomodoro.domain.model
 
-import com.example.taskpomodoro.data.dataclasses.PomodoroUiState
+import com.example.taskpomodoro.ui.state.PomodoroUiState
 import com.example.taskpomodoro.ui.state.PomodoroState
 import kotlinx.coroutines.flow.StateFlow
 

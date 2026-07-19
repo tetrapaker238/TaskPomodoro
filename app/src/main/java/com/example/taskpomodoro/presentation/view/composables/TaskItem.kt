@@ -17,34 +17,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.taskpomodoro.R
+import com.example.taskpomodoro.domain.enums.TaskImportance
 
-
-enum class Importance {
-    LOW,
-    MEDIUM,
-    HIGH,
-    VERY_HIGH;
-
-    val color: Color
-        get() = when (this) {
-            LOW -> Color.LightGray
-            MEDIUM -> Color.Blue
-            HIGH -> Color(0xFFFFA500)
-            VERY_HIGH -> Color.Yellow
-        }
-}
 
 @Composable
 fun TaskItem(
     modifier: Modifier = Modifier,
     task: String,
-    taskImportance: Importance = Importance.LOW
+    taskImportance: TaskImportance = TaskImportance.LOW
 ) {
 
     var taskChecked by rememberSaveable { mutableStateOf(false) }
@@ -82,8 +67,8 @@ fun TaskItem(
 fun TaskItemPreview() {
     Column() {
         TaskItem(task = "Crear el task pomodoro")
-        TaskItem(task = "Crear el task pomodoro", taskImportance = Importance.MEDIUM)
-        TaskItem(task = "Crear el task pomodoro", taskImportance = Importance.HIGH)
-        TaskItem(task = "Crear el task pomodoro", taskImportance = Importance.VERY_HIGH)
+        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.MEDIUM)
+        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.HIGH)
+        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.VERY_HIGH)
     }
 }

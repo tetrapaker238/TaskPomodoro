@@ -33,7 +33,6 @@ import com.example.taskpomodoro.R
 fun TaskSection(modifier: Modifier = Modifier) {
 
     val taskList = rememberSaveable { mutableStateListOf<String>() }
-    var enabledTaskBar by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -47,35 +46,6 @@ fun TaskSection(modifier: Modifier = Modifier) {
             HorizontalDivider(thickness = 2.dp)
             TaskList(tasks = taskList.toList())
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (enabledTaskBar) {
-                TaskTextbar(
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .padding(horizontal = 8.dp)
-                ) { task ->
-                    taskList.add(task)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedButton(onClick = {
-                    enabledTaskBar = !enabledTaskBar
-                }) {
-                    Text(if (enabledTaskBar) "Stop adding tasks" else "Add task")
-                    Icon(
-                        painter = painterResource(
-                            id = if (enabledTaskBar) R.drawable.check_24px else R.drawable.add_24px
-                        ),
-                        contentDescription = if (enabledTaskBar) "Done adding tasks" else "Add Task"
-                    )
-                }
-            }
         }
     }
 }

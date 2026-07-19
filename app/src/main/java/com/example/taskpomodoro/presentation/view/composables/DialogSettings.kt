@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
+import com.example.taskpomodoro.domain.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.ui.theme.TaskPomodoroTheme
 
 @Composable

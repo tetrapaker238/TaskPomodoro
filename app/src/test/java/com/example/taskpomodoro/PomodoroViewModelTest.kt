@@ -1,6 +1,6 @@
 package com.example.taskpomodoro
 
-import com.example.taskpomodoro.data.dataclasses.PomodoroSettings
+import com.example.taskpomodoro.domain.dataclasses.PomodoroSettings
 import com.example.taskpomodoro.domain.model.Timer
 import com.example.taskpomodoro.domain.model.TimerListener
 import com.example.taskpomodoro.presentation.viewmodel.PomodoroViewModel
