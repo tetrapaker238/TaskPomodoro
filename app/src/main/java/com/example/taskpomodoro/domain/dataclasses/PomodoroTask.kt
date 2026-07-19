@@ -6,5 +6,5 @@ import com.example.taskpomodoro.domain.enums.TaskStatus
 data class PomodoroTask (
     val text: String = "",
     val importance: TaskImportance = TaskImportance.LOW,
-    val state: TaskStatus = TaskStatus.UNDONE
+    val status: TaskStatus = TaskStatus.UNDONE
 )

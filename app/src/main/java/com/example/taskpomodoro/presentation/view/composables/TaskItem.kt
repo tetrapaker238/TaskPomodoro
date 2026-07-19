@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.taskpomodoro.R
+import com.example.taskpomodoro.data.local.LocalTasksDataProvider
 import com.example.taskpomodoro.domain.enums.TaskImportance
 
 
@@ -29,10 +30,11 @@ import com.example.taskpomodoro.domain.enums.TaskImportance
 fun TaskItem(
     modifier: Modifier = Modifier,
     task: String,
-    taskImportance: TaskImportance = TaskImportance.LOW
+    taskImportance: TaskImportance = TaskImportance.LOW,
+    done: Boolean = false
 ) {
 
-    var taskChecked by rememberSaveable { mutableStateOf(false) }
+    var taskChecked by rememberSaveable { mutableStateOf(done) }
     val textDecoration = if (taskChecked) TextDecoration.LineThrough else null
 
     Column(
@@ -66,9 +68,6 @@ fun TaskItem(
 @Composable
 fun TaskItemPreview() {
     Column() {
-        TaskItem(task = "Crear el task pomodoro")
-        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.MEDIUM)
-        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.HIGH)
-        TaskItem(task = "Crear el task pomodoro", taskImportance = TaskImportance.VERY_HIGH)
+        LocalTasksDataProvider.sampleTasks
     }
 }
